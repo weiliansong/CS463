@@ -2,81 +2,113 @@ import numpy as np
 
 class Puzzle:
 
-    def __init__(self):
-        self.ball = np.zeros((3,3,3), dtype=np.int32)
-        self.center_edge = np.zeros((3,3,3), dtype=np.int32)
+  def __init__(self):
+    self.ball = np.zeros((6,3,3), dtype=np.int32)
+    self.lat_edge = np.zeros(4, dtype=np.int32)
+    self.lon_edge = np.zeros(4, dtype=np.int32)
+    self.cut_edge = np.zeros(4, dtype=np.int32)
 
-    def reset(self):
-        self.ball = np.arange(27).reshape((3,3,3))
-        self.center_edge = np.zeros((3,3,3), dtype=np.int32)
+  def reset(self):
+    for idx in range(6):
+      self.ball[idx,:,:].fill(idx)
 
-    # TODO Make sure slices are retrieved correctly
-    def move(self, face, dir):
-        direction = {'ccw': [1,0], 'cw': [0,1]}
+    self.lat_edge = np.zeros(4, dtype=np.int32)
+    self.lon_edge = np.zeros(4, dtype=np.int32)
+    self.cut_edge = np.zeros(4, dtype=np.int32)
 
-        if face == 'left':
-            slice = self.ball[:,:,0]
-            self.ball[:,:,0] = np.rot90(slice, axes=direction[dir])
-            self.center_edge[:,:,1] += np.diff(direction[dir]) * 300
-            self.center_edge[:,:,1] = np.mod(self.center_edge[:,:,1], 360)
+  # TODO Make sure slices are retrieved correctly
+  def move(self, face, dir):
+    direction = {'ccw': [1,0], 'cw': [0,1]}
 
-        elif face == 'right':
-            slice = self.ball[:,:,2]
-            self.ball[:,:,2] = np.rot90(slice, axes=direction[dir])
-            self.center_edge[:,:,1] += np.diff(direction[dir]) * 300
-            self.center_edge[:,:,1] = np.mod(self.center_edge[:,:,1], 360)
+    if face == 0 or face == 2:
 
-        elif face == 'top':
-            slice = self.ball[0,:,:]
-            self.ball[0,:,:] = np.rot90(slice, axes=direction[dir])
-            self.center_edge[1,:,:] += np.diff(direction[dir]) * 300
-            self.center_edge[1,:,:] = np.mod(self.center_edge[:,:,1], 360)
+      if face == 0:
+        np.rot90(self.ball[0,:,:], axes=direction[dir])
+        np.rot90(self.ball[2,:,:], axes=np.flip(direction[dir]))
 
-        elif face == 'bottom':
-            slice = self.ball[2,:,:]
-            self.ball[2,:,:] = np.rot90(slice, axes=direction[dir])
-            self.center_edge[1,:,:] += np.diff(direction[dir]) * 300
-            self.center_edge[1,:,:] = np.mod(self.center_edge[:,:,1], 360)
+      if face == 2:
+        np.rot90(self.ball[2,:,:], axes=direction[dir])
+        np.rot90(self.ball[0,:,:], axes=np.flip(direction[dir]))
 
-        elif face == 'back':
-            slice = self.ball[:,0,:]
-            self.ball[:,0,:] = np.rot90(slice, axes=direction[dir])
-            self.center_edge[:,1,:] += np.diff(direction[dir]) * 300
-            self.center_edge[:,1,:] = np.mod(self.center_edge[:,:,1], 360)
+      order = [2,6,4,5]
 
-        elif face == 'front':
-            slice = self.ball[:,2,:]
-            self.ball[:,2,:] = np.rot90(slice, axes=direction[dir])
-            self.center_edge[:,1,:] += np.diff(direction[dir]) * 300
-            self.center_edge[:,1,:] = np.mod(self.center_edge[:,:,1], 360)
+      if dir == 'ccw':
+        order = np.flip(order)
 
-        else:
-            raise Exception('Not valid move')
+      temp = self.ball[order[0],:,0]
+      self.ball[order[0],:,0] = self.ball[order[1],:,0]
+      self.ball[order[1],:,0] = self.ball[order[2],:,0]
+      self.ball[order[2],:,0] = self.ball[order[3],:,0]
+      self.ball[order[3],:,0] = temp
 
-    def print_layers(self):
-        for idx, layer in enumerate(self.ball):
-            print(idx)
-            print(layer)
+      temp = self.ball[order[0],:,2]
+      self.ball[order[0],:,2] = self.ball[order[1],:,2]
+      self.ball[order[1],:,2] = self.ball[order[2],:,2]
+      self.ball[order[2],:,2] = self.ball[order[3],:,2]
+      self.ball[order[3],:,2] = temp
 
-        for idx, layer in enumerate(self.center_edge):
-            print(idx, 'center edge')
-            print(layer)
+      # Don't know if this works...
+      self.lon_edge -= direction[dir] * 300
 
-    def test(self):
-        self.reset()
-        self.print_layers()
-        self.move('right', 'cw')
-        self.print_layers()
-        print('\n')
+    elif face == 1 or face == 3:
 
-        self.move('right', 'cw')
-        self.print_layers()
-        print('\n')
+      if face == 1:
+        np.rot90(self.ball[1,:,:], axes=direction[dir])
+        np.rot90(self.ball[3,:,:], axes=np.flip(direction[dir]))
 
-        self.move('right', 'cw')
-        self.print_layers()
-        print('\n')
+      if face == 3:
+        np.rot90(self.ball[3,:,:], axes=direction[dir])
+        np.rot90(self.ball[1,:,:], axes=np.flip(direction[dir]))
 
-        self.move('right', 'cw')
-        self.print_layers()
-        print('\n')
+      order = [4,2,5,0]
+
+      if dir == 'ccw':
+        order = np.flip(order)
+
+      temp = self.ball[order[0],2,:]
+      self.ball[order[0],2,:] = self.ball[order[1],2,:]
+      self.ball[order[1],2,:] = self.ball[order[2],2,:]
+      self.ball[order[2],2,:] = self.ball[order[3],2,:]
+      self.ball[order[3],2,:] = temp
+
+      temp = self.ball[order[0],0,:]
+      self.ball[order[0],0,:] = self.ball[order[1],0,:]
+      self.ball[order[1],0,:] = self.ball[order[2],0,:]
+      self.ball[order[2],0,:] = self.ball[order[:],0,:]
+      self.ball[order[3],0,:] = temp
+
+      # Don't know if this works...
+      self.cut_edge -= direction[dir] * 300
+
+    elif face == 4 or face == 5:
+
+      if face == 4:
+        np.rot90(self.ball[4,:,:], axes=direction[dir])
+        np.rot90(self.ball[5,:,:], axes=np.flip(direction[dir]))
+
+      if face == 5:
+        np.rot90(self.ball[5,:,:], axes=direction[dir])
+        np.rot90(self.ball[4,:,:], axes=np.flip(direction[dir]))
+
+      order = [0,3,2,1]
+
+      if dir == 'ccw':
+        order = np.flip(order)
+
+      temp = self.ball[order[0],0,:]
+      self.ball[order[0],0,:] = self.ball[order[1],0,:]
+      self.ball[order[1],0,:] = self.ball[order[2],0,:]
+      self.ball[order[2],0,:] = self.ball[order[3],0,:]
+      self.ball[order[3],0,:] = temp
+
+      temp = self.ball[order[0],2,:]
+      self.ball[order[0],2,:] = self.ball[order[1],2,:]
+      self.ball[order[1],2,:] = self.ball[order[2],2,:]
+      self.ball[order[2],2,:] = self.ball[order[:],2,:]
+      self.ball[order[3],2,:] = temp
+
+      # Don't know if this works...
+      self.lat_edge -= direction[dir] * 300
+
+    else:
+      raise Exception('Not valid move')
