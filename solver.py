@@ -1,31 +1,18 @@
 import copy
+import time
 import numpy as np
-
 from heapq import heappush, heappop
 
 class Solver:
 
-  def __init__():
-    # All possible moves
+  def __init__(self):
+    # All possible moves according to my rules
     self.possible_moves = [[0, 'cw'], [0, 'ccw'],
                            [1, 'cw'], [1, 'ccw'],
                            [4, 'cw'], [4, 'ccw']]
 
-  # LOL this seems too easy... 
-  def loss(puzzle):
-    loss = 0
-
-    for middle, face in enumerate(puzzle.ball):
-      # middle is the center color of the face
-      loss += np.count_nonzero(face - idx)
-
-    loss += np.count_nonzero(puzzle.lat_edges)
-    loss += np.count_nonzero(puzzle.lon_edges)
-    loss += np.count_nonzero(puzzle.cut_edges)
-
-    return int(loss / 36)
-
-  def neighbors(puzzle):
+  # Make each move from puzzle and return each moved puzzle
+  def neighbors(self, puzzle):
     puzzles = []
 
     for move in self.possible_moves:
@@ -37,30 +24,48 @@ class Solver:
 
   # Implemented with inspiration from
   # http://www.redblobgames.com/pathfinding/a-star/implementation.html
-  def a_star(puzzle):
+  def a_star(self, start):
     frontier = []
-    path = {}
+    heappush(frontier, (0, start))
+    came_from = {}
     cost_so_far = {}
+    final_state = None
 
-    path[puzzle] = None
-    cost_so_far[puzzle] = 0
+    came_from[start] = None
+    cost_so_far[start] = 0
 
-    # Insert first node here
-    heappush(frontier, (0, puzzle))
+    def contains(state):
+      for key in cost_so_far.keys():
+        if key.equal(state):
+          return True
+
+      return False
+    
+    def costs_less(state, cost):
+      if state not in cost_so_far: return False
+
+      return True if state < cost_so_far[state] else False
 
     while len(frontier):
-      current = heappop(frontier)
+      # for item in frontier:
+      #   print(item)
+      # print()
+      # time.sleep(1)
 
-      if loss(current) == 0:
+      (c_priority, c_state) = heappop(frontier)
+
+      if c_state.is_solved():
+        final_state = c_state
         break
 
-    for (state, move) in neighbors(puzzle):
-      new_cost = cost_so_far[puzzle] + 1
+      for (p_state, p_move) in self.neighbors(c_state):
+        new_cost = cost_so_far[c_state] + 28
 
-      if state not in cost_so_far or new_cost < cost_so_far[puzzle]:
-        cost_so_far[state] = new_cost
-        priority = new_cost + loss(state)
-        heappush(frontier, (priority, state))
-        path[state] = puzzle
+        if not contains(p_state) or costs_less(p_state, new_cost):
+          cost_so_far[p_state] = new_cost
+          came_from[p_state] = c_state
+          priority = new_cost + p_state.dist_heuristic()
 
-    return path, cost_so_far
+          heappush(frontier, (new_cost, p_state))
+
+    return final_state, came_from, cost_so_far

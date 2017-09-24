@@ -8,7 +8,61 @@ class Puzzle:
     self.lon_edges = np.zeros(4, dtype=np.int32)
     self.cut_edges = np.zeros(4, dtype=np.int32)
 
+    self.ball_3d = np.zeros((3,3,3), dtype='3int8')
+
+    for i in range(3):
+      for j in range(3):
+        for k in range(3):
+          self.ball_3d[i,j,k] = [i,j,k]
+
     self.reset()
+
+  def __str__(self):
+    name = 'puzzle_loss: ' + str(self.loss())
+    return name
+
+  def __lt__(self, other):
+    return self.dist_heuristic() < other.dist_heuristic()
+
+  def equal(self, other):
+    difference = 0
+    difference += np.count_nonzero(self.ball - other.ball)
+    difference += np.count_nonzero(self.lat_edges - other.lat_edges)
+    difference += np.count_nonzero(self.lon_edges - other.lon_edges)
+    difference += np.count_nonzero(self.cut_edges - other.cut_edges)
+
+    return not difference
+
+  def manhattan(self, p1, p2):
+    return np.abs(p1[0]-p2[0]) + np.abs(p1[1]-p2[1]) + np.abs(p1[2]-p2[2])
+
+  def dist_heuristic(self):
+    edges = 0
+    corners = 0
+
+    # Edges first
+    for i in [0,1,2]:
+      for j in [[0,1], [1,0], [1,2], [2,1]]:
+        x = i
+        y, z = j
+        
+        edges += self.manhattan((x,y,z), self.ball_3d[x,y,z])
+
+    # Corners next
+    for i in [0,2]:
+      for j in [0,2]:
+        for k in [0,2]:
+          corners += self.manhattan((x,y,z), self.ball_3d[x,y,z])
+
+    return max(edges/8, corners/8)
+
+  def is_solved(self):
+    pieces_wrong = 0.0
+
+    for middle, face in enumerate(self.ball):
+      pieces_wrong += np.count_nonzero(face - middle)
+
+    return not pieces_wrong
 
   def reset(self):
     for idx in range(6):
@@ -17,6 +71,11 @@ class Puzzle:
     self.lat_edges = np.zeros(4, dtype=np.int32)
     self.lon_edges = np.zeros(4, dtype=np.int32)
     self.cut_edges = np.zeros(4, dtype=np.int32)
+
+    for i in range(3):
+      for j in range(3):
+        for k in range(3):
+          self.ball_3d[i,j,k] = [i,j,k]
 
   # 0 Left
   # 1 Front
@@ -28,6 +87,9 @@ class Puzzle:
     direction = {'cw': [1,0], 'ccw': [0,1]}
 
     if face == 0:
+      # Rotate 3D matrix
+      self.ball_3d[:,:,0] = np.rot90(self.ball_3d[:,:,0], axes=direction[dir])
+      self.ball_3d[:,:,2] = np.rot90(self.ball_3d[:,:,2], axes=direction[dir])
 
       self.ball[0,:,:] = np.rot90(self.ball[0,:,:], axes=direction[dir])
       self.ball[2,:,:] = np.rot90(self.ball[2,:,:], axes=direction[dir])
@@ -69,7 +131,7 @@ class Puzzle:
       self.lon_edges = np.mod(self.lon_edges, 360)
 
       # Copy lat edge for copying
-      cpy_edges = self.lat_edges
+      cpy_edges = np.copy(self.lat_edges)
 
       if dir == 'cw':
         self.lat_edges[0] = self.cut_edges[1]
@@ -95,6 +157,9 @@ class Puzzle:
 
 
     elif face in [1]:
+      # Rotate 3D matrix
+      self.ball_3d[:,2,:] = np.rot90(self.ball_3d[:,2,:], axes=direction[dir])
+      self.ball_3d[:,0,:] = np.rot90(self.ball_3d[:,0,:], axes=direction[dir])
 
       self.ball[1,:,:] = np.rot90(self.ball[1,:,:], axes=direction[dir])
       self.ball[3,:,:] = np.rot90(self.ball[3,:,:], axes=direction[dir])
@@ -135,7 +200,7 @@ class Puzzle:
       self.cut_edges += [300, 300, 300, 300] * np.diff(direction[dir])
       self.cut_edges = np.mod(self.cut_edges, 360)
 
-      cpy_edges = self.lon_edges
+      cpy_edges = np.copy(self.lon_edges)
 
       if dir == 'cw':
         self.lon_edges[0] = self.lat_edges[3]
@@ -160,6 +225,9 @@ class Puzzle:
         self.lat_edges[3] = cpy_edges[3]
 
     elif face in [4]:
+      # Rotate 3D matrix
+      self.ball_3d[0,:,:] = np.rot90(self.ball_3d[0,:,:], axes=direction[dir])
+      self.ball_3d[2,:,:] = np.rot90(self.ball_3d[2,:,:], axes=direction[dir])
 
       self.ball[4,:,:] = np.rot90(self.ball[4,:,:], axes=direction[dir])
       self.ball[5,:,:] = np.rot90(self.ball[5,:,:], axes=direction[dir])
@@ -200,7 +268,7 @@ class Puzzle:
       self.lat_edges += [300, 300, 300, 300] * np.diff(direction[dir])
       self.lat_edges = np.mod(self.lat_edges, 360)
 
-      cpy_edges = self.cut_edges
+      cpy_edges = np.copy(self.cut_edges)
 
       if dir == 'cw':
         self.cut_edges[0] = self.lon_edges[3]

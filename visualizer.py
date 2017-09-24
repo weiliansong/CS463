@@ -8,6 +8,14 @@ class Visualizer:
     fig, axes = plt.subplots()
     self.fig = fig
     self.axes = axes
+    self.rot_key = {
+      120: '/',
+      300: '/',
+      60:  '\\',
+      240: '\\',
+      0:   '-',
+      180: '-'
+    }
 
   # 0 Blue
   # 1 Yellow
@@ -16,9 +24,16 @@ class Visualizer:
   # 4 Red
   # 5 Purple
   def visualize(self, puzzle):
-    print('lat edges', puzzle.lat_edges)
-    print('lon edges', puzzle.lon_edges)
-    print('cut edges', puzzle.cut_edges)
+
+    print('lat edges')
+    print([self.rot_key[x] + ' ' for x in puzzle.lat_edges])
+
+    print('lon edges')
+    print([self.rot_key[x] + ' ' for x in puzzle.lon_edges])
+
+    print('cut edges')
+    print([self.rot_key[x] + ' ' for x in puzzle.cut_edges])
+
     print('\n')
 
     cross = np.zeros((12,9), np.float32)
