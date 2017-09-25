@@ -5,9 +5,6 @@ import matplotlib.colors as mcolors
 class Visualizer:
 
   def __init__(self):
-    fig, axes = plt.subplots()
-    self.fig = fig
-    self.axes = axes
     self.rot_key = {
       120: '/',
       300: '/',
@@ -17,13 +14,8 @@ class Visualizer:
       180: '-'
     }
 
-  # 0 Blue
-  # 1 Yellow
-  # 2 Green
-  # 3 Orange
-  # 4 Red
-  # 5 Purple
   def visualize(self, puzzle):
+    fig, axes = plt.subplots()
 
     print('lat edges')
     print([self.rot_key[x] + ' ' for x in puzzle.lat_edges])
@@ -49,8 +41,7 @@ class Visualizer:
     cmap = mcolors.LinearSegmentedColormap.from_list('mycmap', 
         ['white', 'blue', 'yellow', 'green', 'orange', 'purple', 'red'])
 
-    # import ipdb; ipdb.set_trace()
-    self.axes.matshow(cross, cmap=cmap)
-    self.axes.axis('off')
-    self.fig.show()
+    axes.matshow(cross, cmap=cmap)
+    axes.axis('off')
+    fig.show()
     plt.pause(1)

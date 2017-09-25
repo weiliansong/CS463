@@ -3,27 +3,27 @@ import numpy as np
 class Puzzle:
 
   def __init__(self):
+    # Data structure from puzzle 1
     self.ball = np.zeros((6,3,3), dtype=np.int32)
     self.lat_edges = np.zeros(4, dtype=np.int32)
     self.lon_edges = np.zeros(4, dtype=np.int32)
     self.cut_edges = np.zeros(4, dtype=np.int32)
 
+    # Data structure for puzzle 2, mostly for heuristics
     self.ball_3d = np.zeros((3,3,3), dtype='3int8')
-
-    for i in range(3):
-      for j in range(3):
-        for k in range(3):
-          self.ball_3d[i,j,k] = [i,j,k]
 
     self.reset()
 
+  # Better object name when I print this in python
   def __str__(self):
     name = 'puzzle_loss: ' + str(self.loss())
     return name
 
+  # Required for PriorityQueue inserting
   def __lt__(self, other):
     return self.dist_heuristic() < other.dist_heuristic()
 
+  # Special function to check if two puzzles are equal to each other
   def equal(self, other):
     difference = 0
     difference += np.count_nonzero(self.ball - other.ball)
@@ -33,14 +33,16 @@ class Puzzle:
 
     return not difference
 
+  # Computes the manhattan distance between two points on the gear ball
   def manhattan(self, p1, p2):
     return np.abs(p1[0]-p2[0]) + np.abs(p1[1]-p2[1]) + np.abs(p1[2]-p2[2])
 
+  # Heuristic function.
   def dist_heuristic(self):
     edges = 0
     corners = 0
 
-    # Edges first
+    # Computes the sum of all edges displacement
     for i in [0,1,2]:
       for j in [[0,1], [1,0], [1,2], [2,1]]:
         x = i
@@ -48,14 +50,17 @@ class Puzzle:
         
         edges += self.manhattan((x,y,z), self.ball_3d[x,y,z])
 
-    # Corners next
+    # Computes the sum of all corner displacement
     for i in [0,2]:
       for j in [0,2]:
         for k in [0,2]:
           corners += self.manhattan((x,y,z), self.ball_3d[x,y,z])
 
+    # Choose the larger of the two
     return max(edges/8, corners/8)
 
+  # Check to see if puzzle is solved everywhere except for the rotation of 
+  # the edge pieces, those doesn't have to be solved
   def is_solved(self):
     pieces_wrong = 0.0
 
@@ -64,6 +69,7 @@ class Puzzle:
 
     return not pieces_wrong
 
+  # Resets the puzzle
   def reset(self):
     for idx in range(6):
       self.ball[idx,:,:].fill(idx)
@@ -91,9 +97,11 @@ class Puzzle:
       self.ball_3d[:,:,0] = np.rot90(self.ball_3d[:,:,0], axes=direction[dir])
       self.ball_3d[:,:,2] = np.rot90(self.ball_3d[:,:,2], axes=direction[dir])
 
+      # Rotate face matrix
       self.ball[0,:,:] = np.rot90(self.ball[0,:,:], axes=direction[dir])
       self.ball[2,:,:] = np.rot90(self.ball[2,:,:], axes=direction[dir])
 
+      # Tedious code to rotate moved pieces other than the two face matrices
       if dir == 'ccw':
         order = [4,1,5,3]
 
@@ -127,12 +135,15 @@ class Puzzle:
       else:
         raise Exception('Not a valid move')
 
+      # Rotating longitude edges, as they are rotated when moving the left face
       self.lon_edges += [300, 300, 300, 300] * np.diff(direction[dir])
       self.lon_edges = np.mod(self.lon_edges, 360)
 
       # Copy lat edge for copying
       cpy_edges = np.copy(self.lat_edges)
 
+      # Latitude edges are moved to cut axis, and cut edges are moved to
+      # latitude axis
       if dir == 'cw':
         self.lat_edges[0] = self.cut_edges[1]
         self.lat_edges[1] = self.cut_edges[0]
