@@ -1,59 +1,25 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
-typedef vector<int> vi;
-typedef vector<vi> vvi;
+#include "util.h"
 
 using namespace std;
 
-int abs(int a) {
-  return a > 0 ? a : -a;
-}
+typedef vector<int>		    vi;
+typedef vector<vi>		    vvi;
+typedef map<int, int>     mii;
 
 int main() {
-  // IO stuff...
-  char first;
-  cin >> first;
+  vvi clauses = get_clauses();
 
-  while(first == 'c') {
-    cin.ignore(256, '\n');
-    cin >> first;
-  }
-
-  if(first != 'p') {
-    cout << "No p at the beginning, exiting...\n";
-    exit(1);
-  }
-
-  string format;
-  cin >> format;
-
-  if(format != "cnf") {
-    cout << "Not CNF format, exiting...\n";
-    exit(1);
-  }
-
-  int n_vars, n_clauses;
-  cin >> n_vars >> n_clauses;
-
-  vvi clauses;
-
-  // Grab all the clauses
-  while(n_clauses--) {
-    int var; vi clause;
-    cin >> var;
-
-    while(var != 0) {
-      clause.push_back(var);
-      cin >> var;
-    }
-
-    clauses.push_back(clause);
-  }
+  // Test to ensure correct reading of file
+  // for(int i=0; i < clauses.size(); i++) {
+  //   for(int j = 0; j < clauses[i].size(); j++)
+  //     printf("%d ", clauses[i][j]);
+  //   printf("\n");
+  // }
 
   return 0;
 }
-
 
 // Notes: make sure to index correctly into the array of assignment
