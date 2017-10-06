@@ -8,30 +8,33 @@ typedef vector<int>		    vi;
 typedef vector<vi>		    vvi;
 typedef map<int, int>     mii;
 
-bool _or(vi vars, mii assignment) {
+bool _or(vi vars, mii dict) {
   int results = 0;
 
   for(int i = 0; i < vars.size(); i++) 
-    results += assignment[vars[i]];
+    results += dict[vars[i]];
 
   return results;
 }
 
-bool _and(vi vars, mii assignment) {
+bool _and(vi vars, mii dict) {
   int results = 1;
 
   for(int i = 0; i < vars.size(); i++) 
-    results *= vars[i];
+    results *= dict[vars[i]];
 
   return results;
 }
 
-int abs(int a) {
-  return a > 0 ? a : -a;
+int sum(vi nums) {
+  int _sum = 0;
+  for(int i = 0; i < nums.size(); i++)
+    _sum += nums[i];
+
+  return _sum;
 }
 
 vvi get_clauses() {
-  // IO stuff...
   char first;
   cin >> first;
 
@@ -72,4 +75,13 @@ vvi get_clauses() {
   }
 
   return clauses;
+}
+
+int eval(vvi clauses, mii dict) {
+  vi clause_evals;
+
+  for(int i = 0; i < clauses.size(); i++)
+    clause_evals.push_back(_or(clauses[i], dict));
+
+  return sum(clause_evals);
 }
