@@ -1,3 +1,5 @@
+#include <ctime>
+#include <cstdlib>
 #include <iostream>
 #include <vector>
 #include "util.h"
@@ -34,7 +36,7 @@ int sum(vi nums) {
   return _sum;
 }
 
-vvi get_clauses() {
+void get_clauses(int &n_vars, vvi &clauses) {
   char first;
   cin >> first;
 
@@ -56,10 +58,8 @@ vvi get_clauses() {
     exit(1);
   }
 
-  int n_vars, n_clauses;
+  int n_clauses;
   cin >> n_vars >> n_clauses;
-
-  vvi clauses;
 
   // Grab all the clauses
   while(n_clauses--) {
@@ -73,8 +73,6 @@ vvi get_clauses() {
 
     clauses.push_back(clause);
   }
-
-  return clauses;
 }
 
 int eval(vvi clauses, mii dict) {
@@ -84,4 +82,18 @@ int eval(vvi clauses, mii dict) {
     clause_evals.push_back(_or(clauses[i], dict));
 
   return sum(clause_evals);
+}
+
+mii random_assignment(int num_vars) {
+  srand(time(0));
+
+  mii assignments;
+
+  for(int i = 1; i <= num_vars; i++) {
+    int value = rand() % 2;
+    assignments[i] = value;
+    assignments[-i] = (value + 1) % 2;
+  }
+
+  return assignments;
 }
