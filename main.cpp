@@ -4,6 +4,7 @@
 #include <ctime>
 #include <cstdlib>
 #include "util.h"
+#include "hill.h"
 
 using namespace std;
 
@@ -23,13 +24,13 @@ int main() {
   //     printf("%d ", clauses[i][j]);
   //   printf("\n");
   // }
+  
+  bool solved = hill_climb(n_vars, clauses);
 
-  mii dict = random_assignment(n_vars);
-
-  for(auto it = dict.begin(); it != dict.end(); it++)
-    cout<< it->first << ' ' << it->second << endl;
+  if(solved)
+    printf("SATISFIABLE\n");
+  else
+    printf("NOT SATISFIABLE\n");
 
   return 0;
 }
-
-// Notes: make sure to index correctly into the array of assignment
