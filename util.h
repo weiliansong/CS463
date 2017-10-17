@@ -8,13 +8,7 @@ typedef vector<vi>		    vvi;
 typedef map<int, int>     mii;
 
 // OR the variables together, given their assignments through a hashmap
-bool _or(vi vars, mii dict);
-
-// AND the variables together, given their assignments through a hashmap
-bool _and(vi vars, mii dict);
-
-// Sum a vector of elements
-int sum(vi nums);
+bool set_or(vi vars, mii dict);
 
 // IO stuff. Passing stuff by reference as we need to return more than one
 void get_clauses(int &n_vars, vvi &clauses);

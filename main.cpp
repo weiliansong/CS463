@@ -32,5 +32,15 @@ int main() {
   else
     printf("NOT SATISFIABLE\n");
 
+  // mii dict = random_assignment(n_vars);
+
+  // int sum = 0;
+
+  // for(int i = 0; i < 410; i++) {
+  //   sum += eval(clauses, dict);
+  // }
+
+  // cout<< sum;
+
   return 0;
 }

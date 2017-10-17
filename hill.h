@@ -3,6 +3,7 @@
 
 #define MAX_ITER 10000
 #define REFRESH_ITER 1000
+#define MAX_REFRESH 100
 
 using namespace std;
 

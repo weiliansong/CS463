@@ -16,10 +16,10 @@ bool hill_climb(int n_vars, vvi clauses) {
   // Boolean to check if we solved the problem
   bool solved = false;
 
-  // How many iterations have we done on the same dict?
-  int num_iter = 0;
+  int num_iter = 0, num_refresh = 0;
 
-  while(!solved || !(MAX_ITER - num_iter)) {
+  // We stop if we solved, reached max iter or max refresh
+  while(!solved || !(MAX_ITER - num_iter) || !(MAX_REFRESH - num_refresh)) {
     int fitness = eval(clauses, dict);
 
     // How many clauses have we solved
@@ -28,31 +28,41 @@ bool hill_climb(int n_vars, vvi clauses) {
     if(fitness == clauses.size())
       solved = true;
  
-    else {
-      // Select a random dict in case if we are stuck at local min
-      if(num_iter >= REFRESH_ITER)
-        dict = random_assignment(n_vars);
-    
-      mii best_dict;
+    else { 
+      int best_choice, swap;
       int best_fitness = fitness, new_fitness;
 
       for(int i = 1; i <= n_vars; i++) {
-        mii new_dict = dict;
-        
         // Swap assignments for i
-        new_dict[i] = (new_dict[i] + 1) % 2;
-        new_dict[-i] = (new_dict[-i] + 1) % 2;
+        swap = dict[i];
+        dict[i] = dict[-i];
+        dict[-i] = swap;
 
-        new_fitness = eval(clauses, new_dict);
+        new_fitness = eval(clauses, dict);
 
         if(new_fitness > best_fitness) {
-          best_dict = new_dict;
+          best_choice = i;
           best_fitness = new_fitness;
         }
+
+        // Swap it back
+        swap = dict[i];
+        dict[i] = dict[-i];
+        dict[-i] = swap;
       }
 
-      dict = best_dict;
+      // Swap it back
+      swap = dict[best_choice];
+      dict[best_choice] = dict[-best_choice];
+      dict[-best_choice] = swap;
       num_iter++;
+
+      // Select a random dict in case if we are stuck at local min
+      if((num_iter >= REFRESH_ITER) || (best_fitness == fitness)) {
+        printf("Stuck at local min, randomizing assignments\n");
+        dict = random_assignment(n_vars);
+        num_refresh++;
+      }
     }
   }
 

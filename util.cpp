@@ -10,30 +10,12 @@ typedef vector<int>		    vi;
 typedef vector<vi>		    vvi;
 typedef map<int, int>     mii;
 
-bool _or(vi vars, mii dict) {
-  int results = 0;
-
+bool set_or(vi vars, mii dict) {
   for(int i = 0; i < vars.size(); i++) 
-    results += dict[vars[i]];
-
-  return results;
-}
-
-bool _and(vi vars, mii dict) {
-  int results = 1;
-
-  for(int i = 0; i < vars.size(); i++) 
-    results *= dict[vars[i]];
-
-  return results;
-}
-
-int sum(vi nums) {
-  int _sum = 0;
-  for(int i = 0; i < nums.size(); i++)
-    _sum += nums[i];
-
-  return _sum;
+    if(dict[vars[i]] == 1)
+      return true;
+  
+  return false;
 }
 
 void get_clauses(int &n_vars, vvi &clauses) {
@@ -76,12 +58,12 @@ void get_clauses(int &n_vars, vvi &clauses) {
 }
 
 int eval(vvi clauses, mii dict) {
-  vi clause_evals;
+  int clause_evals = 0;
 
   for(int i = 0; i < clauses.size(); i++)
-    clause_evals.push_back(_or(clauses[i], dict));
+    clause_evals += set_or(clauses[i], dict);
 
-  return sum(clause_evals);
+  return clause_evals;
 }
 
 mii random_assignment(int num_vars) {
