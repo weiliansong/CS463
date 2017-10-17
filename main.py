@@ -1,10 +1,10 @@
 import time
 import util
-import WalkSAT
+import WalkSAT 
 import numpy as np
 from multiprocessing import Pool
 
-f = open('sat_50.cnf', 'r')
+f = open('easy.cnf', 'r')
 lines = f.readlines()
 f.close()
 
@@ -24,7 +24,7 @@ for line in lines:
   clauses.append(clause)
 
 start = time.time()
-solved = WalkSAT.solve(100, np.array(clauses))
+solved = WalkSAT.solve(100, clauses)
 end = time.time()
 
 print(solved)

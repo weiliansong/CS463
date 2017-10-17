@@ -22,6 +22,7 @@ def fitness_eval(tokens):
   return np.sum(bool_eval(clauses, new_book))
 
 def solve(n_vars, clauses):
+  clauses = np.array(clauses)
   book = random_book(n_vars)
   
   solved = False
@@ -39,18 +40,16 @@ def solve(n_vars, clauses):
       solved = True
 
     else:
-
       # Find index of clauses
       not_sat_idx = [i for i, fit in enumerate(clause_eval) if not fit]
       sat_idx = np.setdiff1d(np.arange(len(clauses)), not_sat_idx)
 
       # Find clauses
       sat_clauses = clauses[sat_idx]
-
       not_sat_clause = clauses[rand.choice(not_sat_idx)]
 
       # 80% chance for us to pick the best variable, 20% chance for random
-      coin_toss = rand.choice([0,1], p=[0.7, 0.3])
+      coin_toss = rand.choice([0,1], p=[0.1, 0.9])
 
       # We pick the best variable
       if coin_toss:
