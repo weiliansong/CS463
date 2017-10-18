@@ -1,35 +1,34 @@
 import numpy as np
 import numpy.random as rand
 from multiprocessing import Pool
-from util import random_book, bool_eval
+from util import bool_eval
 
 def solve(n_vars, clauses):
-  book = random_book()
-  return helper(n_vars, clauses, book)
 
-def helper(n_vars, clauses, book):
-
-  clause_eval = bool_eval(clauses, book)
-  fitness = np.sum(clause_eval)
-
-  if fitness == len(clauses):
+  if not len(clauses):
     return True
 
   vars_to_delete = []
   clauses_to_delete = []
 
-  variables, counts = np.unique(np.concatenate(clauses), return_count=True)
+  variables, counts = np.unique(np.concatenate(clauses), return_counts=True)
   var_counts = dict(zip(variables, counts))
 
   for var in range(1, n_vars+1):
-    if len(var_counts[var]) and len(var_counts[-var]) == 0:
-      book[var] = 1
-      book[-var] = 0
+    if var not in var_counts.keys():
+      var_counts[var] = 0
+
+    if -var not in var_counts.keys():
+      var_counts[-var] = 0
+
+  for var in range(1, n_vars+1):
+    if var not in var_counts.keys():
+      continue
+
+    if var_counts[var] and var_counts[-var] == 0:
       vars_to_delete.append(var)
 
-    elif len(var_counts[var]) == 0 and len(var_counts[-var]):
-      book[var] = 0
-      book[-var] = 1
+    elif var_counts[var] == 0 and var_counts[-var]:
       vars_to_delete.append(-var)
 
     else:
@@ -42,20 +41,19 @@ def helper(n_vars, clauses, book):
     # Check for unit clause
     elif len(clause) == 1:
       var = clause[0]
-      book[var] = 1
-      book[-var] = 0
-      clauses_to_delete.append(idx)
-      continue
+      if var_counts[var] and not var_counts[-var]:
+        clauses_to_delete.append(idx)
+        continue
 
     for var in vars_to_delete:
       if var in clause:
         clauses_to_delete.append(idx)
 
   # Delete all the single-variable clause
-  clauses = np.delete(clauses, things_to_delete) 
+  clauses = np.delete(clauses, clauses_to_delete, axis=0) 
 
   # Finished with pruning, picking one random variable to set true
-  lucky_var = np.choice(np.unique(np.concatenate(clauses)))
+  lucky_var = rand.choice(np.unique(np.concatenate(clauses)))
 
   true_clauses = []
   false_clauses = []
@@ -76,4 +74,4 @@ def helper(n_vars, clauses, book):
       true_clauses.append(clause)
       false_clauses.append(clause)
 
-  return helper(n_vars, true_clauses) or helper(n_vars, false_clauses)
+  return solve(n_vars, true_clauses) or solve(n_vars, false_clauses)

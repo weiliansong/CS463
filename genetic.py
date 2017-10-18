@@ -31,7 +31,7 @@ def crossover(first, second, n_vars):
     # Implementing single point crossover
     pivot = int(rand.rand() * n_vars)
 
-    for i in range(pivot, len(first.keys())):
+    for i in range(pivot, n_vars):
       offspring[i] = second[i]
       offspring[-i] = second[-i]
 
@@ -40,7 +40,7 @@ def crossover(first, second, n_vars):
 def mutate(book, n_vars):
   mutated_book = book.copy()
   num_mutations = np.round(mutation_percent * n_vars)
-  mutate_vars = rand.choice(np.range(1, n_vars+1), size=num_mutations)
+  mutate_vars = rand.choice(np.arange(1, n_vars+1), size=num_mutations)
   
   for var in mutate_vars:
     mutated_book[var] = book[-var]
@@ -112,7 +112,7 @@ def solve(n_vars, clauses):
       first, second = rand.choice(population, size=2, p=prob)
       jobs.append((first, second, n_vars))
 
-    population.extend(p.map(breed, jobs))
+    np.concatenate(population, p.map(breed, jobs))
 
     current_gen += 1
 

@@ -2,6 +2,7 @@ import time
 import util
 import walkSAT 
 import genetic
+import dpll
 import numpy as np
 import argparse
 from multiprocessing import Pool
@@ -35,11 +36,11 @@ for line in lines:
   clauses.append(clause)
 
 clauses = np.array(clauses)
-import ipdb; ipdb.set_trace()
 
 print('Num vars: %d' % n_vars)
+
 start = time.time()
-solved = genetic.solve(n_vars, clauses)
+solved = dpll.solve(n_vars, clauses)
 end = time.time()
 
 print(solved)
