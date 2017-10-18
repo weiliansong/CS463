@@ -22,7 +22,6 @@ def fitness_eval(tokens):
   return np.sum(bool_eval(clauses, new_book))
 
 def solve(n_vars, clauses):
-  clauses = np.array(clauses)
   book = random_book(n_vars)
   
   solved = False

@@ -34,6 +34,9 @@ for line in lines:
 
   clauses.append(clause)
 
+clauses = np.array(clauses)
+import ipdb; ipdb.set_trace()
+
 print('Num vars: %d' % n_vars)
 start = time.time()
 solved = genetic.solve(n_vars, clauses)
