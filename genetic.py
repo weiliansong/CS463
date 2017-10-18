@@ -8,6 +8,13 @@ max_generations = 10000
 survival_rate = 0.75
 gen_limit = 1000
 
+crossover_rate = 0.5
+mutation_rate = 0.5
+mutation_percent = 0.1
+
+def coin_toss(prob):
+  return np.choice([0,1], p=(1-prob,prob))
+
 def softmax(x):
     """Compute softmax values for each sets of scores in x."""
     return np.exp(x) / np.sum(np.exp(x), axis=0)
@@ -17,15 +24,28 @@ def fitness_eval(tokens):
 
   return np.sum(bool_eval(clauses, book))
 
-def crossover(first, second):
-  pass
+# TODO Make sure this works...
+def crossover(first, second, n_vars):
+  offspring = first.copy()
 
-def mutate(book):
-  pass
+  if coin_toss(crossover_rate):
+    # Implementing single point crossover
+    pivot = int(rand.rand() * n_vars)
+
+    for i in range(pivot, len(first.keys())):
+      offspring[i] = second[i]
+      offspring[-i] = second[-i]
+
+  return offspring
+
+def mutate(book, n_vars):
+  num_mutations = np.round(mutation_percent * len(book.keys()))
+  mutate_vars = 
 
 def breed(tokens):
-  first, second = tokens
-  offspring = mutate(crossover(first, second))
+  first, second, n_vars = tokens
+  offspring = crossover(first, second, n_vars)
+  offspring = mutate(offspring, n_vars)
 
   return offspring 
 
@@ -78,7 +98,7 @@ def solve(n_vars, clauses):
     jobs = []
     for i in range(max_population_size - len(population)):
       first, second = np.choice(population, size=2, p=prob)
-      jobs.append(first, second)
+      jobs.append((first, second, n_vars))
 
     population.extend(p.map(breed, jobs))
 
