@@ -13,7 +13,7 @@ mutation_rate = 0.5
 mutation_percent = 0.1
 
 def coin_toss(prob):
-  return np.choice([0,1], p=(1-prob,prob))
+  return rand.choice([0,1], p=(1-prob,prob))
 
 def softmax(x):
     """Compute softmax values for each sets of scores in x."""
@@ -24,7 +24,6 @@ def fitness_eval(tokens):
 
   return np.sum(bool_eval(clauses, book))
 
-# TODO Make sure this works...
 def crossover(first, second, n_vars):
   offspring = first.copy()
 
@@ -39,9 +38,17 @@ def crossover(first, second, n_vars):
   return offspring
 
 def mutate(book, n_vars):
-  num_mutations = np.round(mutation_percent * len(book.keys()))
-  mutate_vars = 
+  mutated_book = book.copy()
+  num_mutations = np.round(mutation_percent * n_vars)
+  mutate_vars = rand.choice(np.range(1, n_vars+1), size=num_mutations)
+  
+  for var in mutate_vars:
+    mutated_book[var] = book[-var]
+    mutated_book[-var] = book[var]
 
+  return mutated_book
+
+# Check to see if this does what we want
 def breed(tokens):
   first, second, n_vars = tokens
   offspring = crossover(first, second, n_vars)
@@ -49,22 +56,27 @@ def breed(tokens):
 
   return offspring 
 
+def random_population(n):
+  population = []
+  for i in range(max_population_size):
+    population.append(random_book(n))
+  population = np.array(population)
+
+  return population
+
 def solve(n_vars, clauses):
 
   # Making population
-  population = []
-  for i in range(max_population_size):
-    population.append(random_book(n_vars))
-  population = np.array(population)
+  population = random_population(n_vars)
 
-  total_gen = 1
-  current_gen = 1
+  total_gen = 0
+  current_gen = 0
   max_fitness = 0
   last_gen = 0
 
   p = Pool(2)
 
-  while current_gen <= max_generations:
+  while True:
 
     # Get the fitness of each member of the population
     jobs = []
@@ -97,7 +109,7 @@ def solve(n_vars, clauses):
 
     jobs = []
     for i in range(max_population_size - len(population)):
-      first, second = np.choice(population, size=2, p=prob)
+      first, second = rand.choice(population, size=2, p=prob)
       jobs.append((first, second, n_vars))
 
     population.extend(p.map(breed, jobs))
@@ -105,4 +117,13 @@ def solve(n_vars, clauses):
     current_gen += 1
 
     if (current_gen - last_gen) > gen_limit:
-      pass
+      total_gen += current_gen
+      
+      if total_gen > max_gen:
+        return False
+
+      else:
+        current_gen = 0
+        last_gen = 0
+        max_fitness = 0
+        population = random_population(n_vars)

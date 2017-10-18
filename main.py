@@ -3,18 +3,28 @@ import util
 import walkSAT 
 import genetic
 import numpy as np
+import argparse
 from multiprocessing import Pool
 
-f = open('test.cnf', 'r')
+parser = argparse.ArgumentParser()
+parser.add_argument('-f', dest='input_file', action='store', type=str)
+
+args = parser.parse_args()
+
+f = open(args.input_file, 'r')
 lines = f.readlines()
 f.close()
 
 clauses = []
+n_vars = -1
 
 for line in lines:
   line = line.strip()
 
-  if line[0] in ['p', 'c']:
+  if line[0] == 'c':
+    continue
+  elif line[0] == 'p':
+    n_vars = int(line.split(' ')[2])
     continue
   
   if line[-1] != '0':
@@ -24,8 +34,9 @@ for line in lines:
 
   clauses.append(clause)
 
+print('Num vars: %d' % n_vars)
 start = time.time()
-solved = genetic.solve(100, clauses)
+solved = genetic.solve(n_vars, clauses)
 end = time.time()
 
 print(solved)
