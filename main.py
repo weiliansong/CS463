@@ -1,10 +1,11 @@
 import time
 import util
-import WalkSAT 
+import walkSAT 
+import genetic
 import numpy as np
 from multiprocessing import Pool
 
-f = open('easy.cnf', 'r')
+f = open('test.cnf', 'r')
 lines = f.readlines()
 f.close()
 
@@ -24,7 +25,7 @@ for line in lines:
   clauses.append(clause)
 
 start = time.time()
-solved = WalkSAT.solve(100, clauses)
+solved = genetic.solve(100, clauses)
 end = time.time()
 
 print(solved)
