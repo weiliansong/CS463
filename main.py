@@ -1,47 +1,48 @@
+import os
 import time
+import walkSAT, genetic, dpll
 import util
-import walkSAT 
-import genetic
-import dpll
 import numpy as np
-import argparse
 from multiprocessing import Pool
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-f', dest='input_file', action='store', type=str)
+args = util.get_args()
 
-args = parser.parse_args()
+clauses, n_vars = util.get_clauses()
 
-f = open(args.input_file, 'r')
-lines = f.readlines()
-f.close()
+def time_it(n_vars, clauses, algorithm):
+  start = time.time()
+  solved, c = algorithm.solve(n_vars, clauses)
+  end = time.time()
 
-clauses = []
-n_vars = -1
+  return solved, c, end-start
 
-for line in lines:
-  line = line.strip()
+def ensure_dir(directory):
+  if not os.path.exists(directory):
+    os.mkdir(directory)
 
-  if line[0] == 'c':
-    continue
-  elif line[0] == 'p':
-    n_vars = int(line.split(' ')[2])
-    continue
-  
-  if line[-1] != '0':
-    raise Exception('Last char not 0')
+# Lol...
+if args.lol:
+  print('[*] Solving %s...' % args.input_file)
+  import pycosat
+  print(pycosat.solve(clauses))
+  exit()
 
-  clause = [int(x) for x in line.split(' ')[:-1] if x]
+ensure_dir('./stats')
 
-  clauses.append(clause)
+# WalkSAT solving
+fname = util.get_csv_name(args.input_file)
 
-clauses = np.array(clauses)
+with open(fname, 'w') as f:
+  f.write('fitness,time\n')
 
-print('Num vars: %d' % n_vars)
+  for i in range(10):
+    if args.verbose:
+      print('[*] Solving %s...' % args.input_file)
 
-start = time.time()
-solved = dpll.solve(n_vars, clauses)
-end = time.time()
+    solved, fitness, runtime = time_it(n_vars, clauses, walkSAT)
 
-print(solved)
-print(end - start)
+    if args.verbose:
+      print('[Y] Max Fit: %3d/%3d | Time: %4.4f seconds | Solved: %s' 
+              % (fitness, len(clauses), runtime, solved))
+
+    f.write('%d,%.4f\n' % (fitness, runtime))

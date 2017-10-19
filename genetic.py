@@ -3,14 +3,15 @@ import numpy.random as rand
 from util import random_book, bool_eval
 from multiprocessing import Pool
 
-max_population_size = 1000
-max_generations = 10000
+max_population_size = 100
+max_gen = 10000
 survival_rate = 0.75
 gen_limit = 1000
 
 crossover_rate = 0.5
+crossover_percent = 0.2
 mutation_rate = 0.5
-mutation_percent = 0.1
+mutation_percent = 0.03
 
 def coin_toss(prob):
   return rand.choice([0,1], p=(1-prob,prob))
@@ -31,6 +32,9 @@ def crossover(first, second, n_vars):
     # Implementing single point crossover
     pivot = int(rand.rand() * n_vars)
 
+    if pivot == 0:
+      pivot += 1
+
     for i in range(pivot, n_vars):
       offspring[i] = second[i]
       offspring[-i] = second[-i]
@@ -39,7 +43,7 @@ def crossover(first, second, n_vars):
 
 def mutate(book, n_vars):
   mutated_book = book.copy()
-  num_mutations = np.round(mutation_percent * n_vars)
+  num_mutations = int(np.round(mutation_percent * n_vars))
   mutate_vars = rand.choice(np.arange(1, n_vars+1), size=num_mutations)
   
   for var in mutate_vars:
@@ -67,7 +71,7 @@ def random_population(n):
 def solve(n_vars, clauses):
 
   # Making population
-  population = random_population(n_vars)
+  population = np.array(random_population(n_vars))
 
   total_gen = 0
   current_gen = 0
@@ -80,7 +84,7 @@ def solve(n_vars, clauses):
 
     # Get the fitness of each member of the population
     jobs = []
-    for i in range(max_population_size):
+    for i in range(len(population)):
       jobs.append((population[i], clauses))
     
     fitnesses = p.map(fitness_eval, jobs)
@@ -112,9 +116,10 @@ def solve(n_vars, clauses):
       first, second = rand.choice(population, size=2, p=prob)
       jobs.append((first, second, n_vars))
 
-    np.concatenate(population, p.map(breed, jobs))
+    np.concatenate([population, p.map(breed, jobs)])
 
     current_gen += 1
+    print(current_gen)
 
     if (current_gen - last_gen) > gen_limit:
       total_gen += current_gen

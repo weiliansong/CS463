@@ -1,11 +1,12 @@
 import numpy as np
 import numpy.random as rand
 from multiprocessing import Pool
-from util import random_book, bool_eval
+from util import random_book, bool_eval, get_args
 
-MAX_ITER = 1000000
-MAX_REFRESH = 100000
-REFRESH_ITER = 10000
+args = get_args()
+
+MAX_ITER = 100
+MAX_FLIP = 1000
 
 def bool_swap(book, idx):
   temp = book[idx]
@@ -22,33 +23,30 @@ def fitness_eval(tokens):
   return np.sum(bool_eval(clauses, new_book))
 
 def solve(n_vars, clauses):
-  book = random_book(n_vars)
-  
-  solved = False
+  max_fitness = 0
 
-  num_iter = 0
-  num_refresh = 0
+  for i in range(MAX_ITER):
+    book = random_book(n_vars)
 
-  while not solved and MAX_ITER-num_iter and MAX_REFRESH-num_refresh:
-    clause_eval = bool_eval(clauses, book)
-    fitness = np.sum(clause_eval)
+    for j in range(MAX_FLIP):
+      clause_eval = bool_eval(clauses, book)
+      fitness = np.sum(clause_eval)
 
-    print('%d / %d' % (fitness, len(clauses)))
+      if args.debug:
+        print('%d / %d' % (fitness, len(clauses)))
 
-    if fitness == len(clauses):
-      solved = True
+      if fitness == len(clauses):
+        return True, fitness
+      else:
+        if fitness > max_fitness:
+          max_fitness = fitness
 
-    else:
       # Find index of clauses
       not_sat_idx = [i for i, fit in enumerate(clause_eval) if not fit]
-      sat_idx = np.setdiff1d(np.arange(len(clauses)), not_sat_idx)
-
-      # Find clauses
-      sat_clauses = clauses[sat_idx]
       not_sat_clause = clauses[rand.choice(not_sat_idx)]
 
-      # 80% chance for us to pick the best variable, 20% chance for random
-      coin_toss = rand.choice([0,1], p=[0.1, 0.9])
+      # 50% chance for us to pick the best variable, 50% chance for random
+      coin_toss = rand.choice([0,1])
 
       # We pick the best variable
       if coin_toss:
@@ -56,7 +54,7 @@ def solve(n_vars, clauses):
         best_var = None
 
         for var in not_sat_clause:
-          fitness = fitness_eval((book, var, sat_clauses))
+          fitness = fitness_eval((book, var, clauses))
 
           if fitness > best_fitness:
             best_fitness = fitness
@@ -64,15 +62,8 @@ def solve(n_vars, clauses):
 
         book = bool_swap(book, best_var)
 
-      # We pick a random variable
+      # We pick a random unsatisfied variable
       else:
         book = bool_swap(book, rand.choice(not_sat_clause))
 
-      num_iter += 1
-
-      if not (num_iter % REFRESH_ITER):
-        print('Stuck at local min, randomizing assignments')
-        book = random_book(n_vars)
-        num_refresh += 1
-
-  return solved
+  return False, max_fitness
