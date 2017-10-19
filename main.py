@@ -39,7 +39,7 @@ with open(fname, 'w') as f:
     if args.verbose:
       print('[*] Solving %s...' % args.input_file)
 
-    solved, fitness, runtime = time_it(n_vars, clauses, genetic)
+    solved, fitness, runtime = time_it(n_vars, clauses, walkSAT)
 
     if args.verbose:
       print('[Y] Max Fit: %3d/%3d | Time: %4.4f seconds | Solved: %s' 

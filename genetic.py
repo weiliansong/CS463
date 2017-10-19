@@ -2,18 +2,24 @@
 import numpy as np
 import numpy.random as rand
 from util import random_book, bool_eval, get_args
-from multiprocessing import Pool
 
 args = get_args()
 
+def trace():
+  import ipdb; ipdb.set_trace()
+
+def print_chromo(chromo):
+  for i in range(1, max(chromo)+1):
+    print('%d: %d' % (i, chromo[i]))
+
 max_population_size = 200
 max_gen = 500
-max_iters = 2500
-survival_rate = 0.20
+max_iters = 50
+survival_rate = 0.10
 
-crossover_rate = 0.2
+crossover_rate = 0.5
 
-mutation_rate = 0.4
+mutation_rate = 0.5
 mutation_percent = 0.05
 
 def coin_toss(prob):
@@ -23,9 +29,7 @@ def softmax(x):
     """Compute softmax values for each sets of scores in x."""
     return np.exp(x) / np.sum(np.exp(x), axis=0)
 
-def fitness_eval(tokens):
-  book, clauses = tokens
-
+def fitness_eval(book, clauses):
   return np.sum(bool_eval(clauses, book))
 
 def crossover(first, second, n_vars):
@@ -53,8 +57,7 @@ def mutate(book, n_vars):
   return mutated_book
 
 # Check to see if this does what we want
-def breed(tokens):
-  first, second, n_vars = tokens
+def breed(first, second, n_vars):
   offspring = first.copy()
   
   if coin_toss(crossover_rate):
@@ -75,7 +78,6 @@ def random_population(n):
 def solve(n_vars, clauses):
 
   best_fitness = 0
-  p = Pool(2)
 
   for out_iter in range(max_iters):
     if args.debug:
@@ -87,16 +89,10 @@ def solve(n_vars, clauses):
     last_gen = 0
 
     for gen_iter in range(max_gen):
-
       # Get the fitness of each member of the population
-      jobs = []
-      for i in range(len(population)):
-        jobs.append((population[i], clauses))
-      
-      fitnesses = p.map(fitness_eval, jobs)
-
-      # Sanity check...
-      assert len(fitnesses) == len(population)
+      fitnesses = []
+      for individual in population:
+        fitnesses.append(fitness_eval(individual, clauses))
 
       # Solved if # of solved clause in fitnesses
       if len(clauses) in fitnesses:
@@ -105,7 +101,7 @@ def solve(n_vars, clauses):
         max_fitness = max(fitnesses)
         if args.debug:
           print('%d / %d : %d / %d' 
-                  % (gen_iter, last_gen ,max_fitness,best_fitness))
+                  % (gen_iter, last_gen, max_fitness, len(clauses)))
 
         if max_fitness > last_best:
           last_gen = 0
@@ -121,7 +117,6 @@ def solve(n_vars, clauses):
           best_fitness = max_fitness
 
       # Sort population by their fitnesses
-      # TODO Check and make sure this works...
       population = population[np.argsort(fitnesses)[::-1]]
       fitnesses = np.sort(fitnesses)[::-1]
 
@@ -132,11 +127,11 @@ def solve(n_vars, clauses):
       # Probability for each book in population to be picked, 90% to 10%
       prob = softmax(fitnesses)
 
-      jobs = []
+      new_population = []
       for i in range(max_population_size - len(population)):
         first, second = rand.choice(population, size=2, p=prob)
-        jobs.append((first, second, n_vars))
+        new_population.append(breed(first, second, n_vars))
 
-      population = np.concatenate([population, p.map(breed, jobs)])
+      population = np.concatenate([population, new_population])
 
   return False, best_fitness
