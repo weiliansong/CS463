@@ -36,23 +36,26 @@ def grab_data(csv_files):
 def plot(labels, values, plt_title, y_label):
   assert len(labels) == len(values)
 
+  sort_idx = np.argsort(values)[::-1]
+  labels = labels[sort_idx]
+  values = values[sort_idx]
+
   split_labels = np.array_split(labels, 3)
   split_values = np.array_split(values, 3)
 
   plot_datas = zip(split_labels, split_values)
 
   for plot_idx, (_labels, _values) in enumerate(plot_datas):
-    sort_idx = np.argsort(_values)[::-1]
-    _labels = _labels[sort_idx]
-    _values = _values[sort_idx]
-
-    plt.plot(range(len(_values)), _values)
+    fig = plt.figure(figsize=(20,10), dpi=80)
+    ax = fig.add_subplot(111)
+    ax.plot(range(len(_values)), _values)
     plt.xticks(range(len(_labels)), _labels, rotation=90)
     plt.xlabel('Algorithm ID')
     plt.ylabel(y_label)
+    plt.title('%s %d' % (plt_title, plot_idx+1))
     plt.tight_layout()
-    plt.title('%s %d' % (plt_title, plot_idx))
-    plt.savefig('./visualizations/%s_%d.png' % (plt_title, plot_idx))
+    fig.savefig('./visualizations/%s_%d.png' % (plt_title, plot_idx+1))
+    plt.clf()
 
 walksat_data = grab_data(glob.glob('./stats_WalkSAT/100_*.csv'))
 genetic_data = grab_data(glob.glob('./stats_Genetic/100_*.csv'))

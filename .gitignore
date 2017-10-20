@@ -2,4 +2,5 @@
 *.cnf
 *.txt
 hard/
-stats/
+stats_*/
+visualizations/
