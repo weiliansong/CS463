@@ -1,7 +1,50 @@
 # README #
 
-## WalkSAT ##
-Below is pseudocode for my WalkSAT program
+## Get Started ##
+I have implemented three SAT solving algorithms, and they are:
+
+1. WalkSAT
+2. Genetic
+3. DPLL
+
+All solvers are written in python 2.7, using these librariees:
+
+1. numpy (for simplifying some tasks)
+2. matplotlib (for making plots)
+
+To solve a single formula, type  
+`python main.py -f path/to/input/file`  
+where `-f` argument specifies the input file, which should be in CNF form.  
+
+To speed up the solving of the formulas, if you're using linux, you can
+install parallel and parallelize the solving of the formulas. Follow the steps
+below:
+
+1. `cd driver`
+2. Make a text file listing the paths to formula files relative to the root of
+   the project folder
+3. `chmod u+x driver.sh runner.sh`
+4. `bash ./driver.sh {input_text_file}`
+
+This will start as many jobs as you have CPU cores, replacing a completed job
+with a new one as soon as one is finished.
+
+Regardless of how you run jobs, there will be three folders created in the
+root of the project folder, `stats_WalkSAT/`, `stats_Genetic/` and
+`stats_DPLL/`.  Each folder represents the method of choice, and within each
+folder will be a bunch of CSVs, whose names will be the names of the CNF
+formula and within each contains runtime and fitness information.
+
+Once the three folders are somewhat populated, you can visualize the data you
+collected by running `python visualize.py`, in which 6 plots will be created,
+three are about runtime of algorithms and the other three are about max
+fitness found for each clause for each formula.
+
+## Algorithms ##
+
+### WalkSAT ###
+Below is pseudocode for my WalkSAT program. Please refer to `walkSAT.py` for
+full implementation details.
 
     for i = 1 -> MAX ITER
       Generate random variable assignments
@@ -29,10 +72,11 @@ Below is pseudocode for my WalkSAT program
 
 I have set `MAX ITER = 100` and `MAX FLIP = 1000`. WalkSAT finds
 satisfiability in a very reasonable amount of time, with worse case less than
-100 seconds, solving 100-variable 430-clause formulas.
+100 seconds, solving 100-variable 400+ clause formulas.
 
-## Genetic ##
-Below is pseudocode for my Genetic program
+### Genetic ###
+Below is pseudocode for my Genetic program. Please refer to `genetic.py` for
+full implementation details.
 
     for i = 1 -> MAX ITER
       Generate a population of random assignments of size TARGET POPULATION SIZE
@@ -78,9 +122,9 @@ MUTATE PERCENT = 5%
 
 TODO: Finish writing this based on what I am actually able to finish
 
-## DPLL ##
-Below is pseudocode for my DPLL program. Please refer to dpll.py for the
-actual implementation.
+### DPLL ###
+Below is pseudocode for my DPLL program. Please refer to dpll.py for full
+implementation details.
 
     function DPLL(clauses)
       if we solved all clauses

@@ -76,7 +76,13 @@ def set_true(var, clauses):
   
   return new_clauses
 
-def solve(clauses):
+def solve(n_vars, clauses):
+  if recursion(clauses):
+    return True, len(clauses)
+  else:
+    return False, 0
+
+def recursion(clauses):
   # print('begin')
   # print(clauses)
   # If we don't have any clauses
@@ -103,7 +109,7 @@ def solve(clauses):
   # print('after pure')
   # print(clauses)
   if has_pure: 
-    if solve(clauses):
+    if recursion(clauses):
       # print('found pure')
       return True
 
@@ -121,7 +127,7 @@ def solve(clauses):
   # print('after unit')
   # print(clauses)
   if has_unit:
-    if solve(clauses):
+    if recursion(clauses):
       # print('found unit')
       return True
 
@@ -141,7 +147,7 @@ def solve(clauses):
   true_clauses = set_true(lucky_var, clauses)
   false_clauses = set_true(-lucky_var, clauses)
 
-  if solve(true_clauses) or solve(false_clauses):
+  if recursion(true_clauses) or recursion(false_clauses):
     return True
   else:
     return False

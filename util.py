@@ -2,7 +2,6 @@ import time
 import argparse
 import numpy as np
 import numpy.random as random
-from multiprocessing import Pool
 
 def random_book(n_vars):
   book = {}
@@ -72,7 +71,7 @@ def get_clauses():
 
   return clauses, n_vars
 
-def get_csv_name(input_file):
+def get_csv_name(input_file, method):
   cnf_fname = input_file.strip().split('/')[-1]
   cnf_fname = cnf_fname[:-4].replace('.', '_')
-  return './stats/' + cnf_fname + '.csv'
+  return './' + method + '/' + cnf_fname + '.csv'

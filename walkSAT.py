@@ -1,6 +1,5 @@
 import numpy as np
 import numpy.random as rand
-from multiprocessing import Pool
 from util import random_book, bool_eval, get_args
 
 args = get_args()
