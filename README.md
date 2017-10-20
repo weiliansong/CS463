@@ -67,14 +67,14 @@ Below is pseudocode for my Genetic program
 
 Below are the set of parameters I used:
 
-MAX ITER = 50
-MAX GEN  = 500
-GEN LIMIT = 100
-TARGET POPULATION SIZE = 200
-SURVIVAL RATE = 10%
-CROSSOVER RATE = 50%
-MUTATE RATE = 40%
-MUTATE PERCENT = 5%
+MAX ITER = 50  
+MAX GEN  = 500  
+GEN LIMIT = 100  
+TARGET POPULATION SIZE = 200  
+SURVIVAL RATE = 10%  
+CROSSOVER RATE = 50%  
+MUTATE RATE = 40%  
+MUTATE PERCENT = 5%  
 
 TODO: Finish writing this based on what I am actually able to finish
 
