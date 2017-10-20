@@ -1,6 +1,6 @@
 *.pyc
 *.cnf
 *.txt
-hard/
+cnf/
 stats_*/
 visualizations/
