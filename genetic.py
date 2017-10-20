@@ -1,17 +1,13 @@
-# https://github.com/domoritz/SoSAT/blob/master/sosat/genetic/algorithm.py
+# Inspiration from pseudocode by Bhattacharjee and Chauhan's Solving the SAT
+# Problem using Genetic Algorithm
+
 import numpy as np
 import numpy.random as rand
 from util import random_book, bool_eval, get_args
 
 args = get_args()
 
-def trace():
-  import ipdb; ipdb.set_trace()
-
-def print_chromo(chromo):
-  for i in range(1, max(chromo)+1):
-    print('%d: %d' % (i, chromo[i]))
-
+# Some parameters
 max_population_size = 200
 max_gen = 500
 max_iters = 50
@@ -22,20 +18,24 @@ crossover_rate = 0.5
 mutation_rate = 0.5
 mutation_percent = 0.05
 
+# A biased coin toss, used to determine to do stuff
 def coin_toss(prob):
   return rand.choice([0,1], p=(1-prob,prob))
 
+# Pushes x to be a probability distribution that sums to one
+# Useful for when picking individuals from population, weighted by fitness
 def softmax(x):
-    """Compute softmax values for each sets of scores in x."""
     return np.exp(x) / np.sum(np.exp(x), axis=0)
 
+# Evaluate how many clauses we got right
 def fitness_eval(book, clauses):
   return np.sum(bool_eval(clauses, book))
 
+# Perform single-point crossover
+# first[:pivot] + second[pivot:]
 def crossover(first, second, n_vars):
   offspring = first.copy()
 
-  # Implementing single point crossover
   pivot_1 = rand.choice(range(1, n_vars+1))
   pivot_2 = rand.choice(range(pivot_1, n_vars+1))
 
@@ -45,6 +45,7 @@ def crossover(first, second, n_vars):
 
   return offspring
 
+# Randomly flips assignment of variables depending on the percentage set
 def mutate(book, n_vars):
   mutated_book = book.copy()
   num_mutations = int(mutation_percent * n_vars)
@@ -56,7 +57,7 @@ def mutate(book, n_vars):
 
   return mutated_book
 
-# Check to see if this does what we want
+# Calls crossover() and mutate() with certain probability
 def breed(first, second, n_vars):
   offspring = first.copy()
   
@@ -68,6 +69,7 @@ def breed(first, second, n_vars):
 
   return offspring 
 
+# Generate a random population
 def random_population(n):
   population = []
   for i in range(max_population_size):
@@ -103,6 +105,7 @@ def solve(n_vars, clauses):
           print('%d / %d : %d / %d' 
                   % (gen_iter, last_gen, max_fitness, len(clauses)))
 
+        # If our fitness improved, reset counter to 0
         if max_fitness > last_best:
           last_gen = 0
           last_best = max_fitness
@@ -110,6 +113,7 @@ def solve(n_vars, clauses):
         elif last_best == max_fitness:
           last_gen += 1
 
+        # If we haven't improved in 100 generations, restart the population
         if last_gen >= 100:
           break
 
@@ -127,6 +131,7 @@ def solve(n_vars, clauses):
       # Probability for each book in population to be picked, 90% to 10%
       prob = softmax(fitnesses)
 
+      # Fill in the rest of the population
       new_population = []
       for i in range(max_population_size - len(population)):
         first, second = rand.choice(population, size=2, p=prob)

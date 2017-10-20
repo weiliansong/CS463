@@ -1,4 +1,8 @@
 # README #
+As this is a Markdown file, feel free to view it in a Markdown viewer, like
+the one below!
+
+https://dillinger.io/
 
 ## Get Started ##
 I have implemented three SAT solving algorithms, and they are:
@@ -22,13 +26,15 @@ below:
 
 1. `apt-get install parallel`
 2. `cd driver`
-3. Make a text file listing the paths to formula files relative to the root of
-   the project folder
-4. `chmod u+x driver.sh runner.sh`
-5. `bash ./driver.sh {input_text_file}`
+3. `chmod u+x driver.sh runner.sh`
+4. `bash ./driver.sh cnf.list`
 
 This will start as many jobs as you have CPU cores, replacing a completed job
 with a new one as soon as one is finished.
+
+Just to demonstrate that graphing works, you can run all the formulas and
+generate fake data for plotting purposes. To do so, for step 4, run 
+`bash ./driver.sh cnf_fake.list` instead.
 
 Regardless of how you run jobs, there will be three folders created in the
 root of the project folder, `stats_WalkSAT/`, `stats_Genetic/` and
@@ -39,8 +45,8 @@ specified formula.
 
 Once the three folders are somewhat populated, you can visualize the data you
 collected by running `python visualize.py`, in which 6 plots will be created,
-three are about runtime of algorithms and the other three are about max
-fitness found for each clause for each formula.
+three are about runtime of each algorithm and the other three are about max
+fitness found for each formula for each algorithm.
 
 ## Algorithms ##
 
@@ -67,14 +73,16 @@ full implementation details.
           flip the assignment of the variable
 
         if coin == tail
-          choose random variable
+          choose random variable from unsatisfied clauses
           flip the assignment of the random variable
 
       return False
 
 I have set `MAX ITER = 100` and `MAX FLIP = 1000`. WalkSAT finds
 satisfiability in a very reasonable amount of time, with worse case less than
-100 seconds, solving 100-variable 400+ clause formulas.
+100 seconds, solving 100-variable 400+ clause formulas. Included directory 
+stats_WalkSAT contains actual statistics collected from solving formulas using
+this algorithm.
 
 ### Genetic ###
 Below is pseudocode for my Genetic program. Please refer to `genetic.py` for
@@ -84,7 +92,7 @@ full implementation details.
       Generate a population of random assignments of size TARGET POPULATION SIZE
 
       last best fitness = 0
-      last best generation = 0
+      stagnation = 0
 
       for j = 1 -> MAX GEN
         Find fitnesses of all individuals of population
@@ -94,10 +102,13 @@ full implementation details.
         else
           if current best fitness > last best fitness
             last best fitness = current best fitness
-            last best generation = j
+            stagnation = 0
+
+          else
+            stagnation++
           
-          if j - last best generation > GEN LIMIT
-            break
+          if stagnation > GEN LIMIT
+            exit to jump out of local min
           
         sort population by their fitness
         
@@ -109,7 +120,7 @@ full implementation details.
           mutate offspring by MUTATE PERCENT, MUTATE RATE percent of the times
           add offspring into population
 
-      return False
+    return False
 
 Below are the set of parameters I used:
 
@@ -122,7 +133,11 @@ CROSSOVER RATE = 50%
 MUTATE RATE = 40%  
 MUTATE PERCENT = 5%  
 
-TODO: Finish writing this based on what I am actually able to finish
+My Genetic implementation is correct and works fine on small instances, but it
+takes way too long on 100-variable 400+ clause instances, therefore I do not
+have the time to run and analyze them. Some dummy stats files are used to
+demonstrate the plotting feature, and please run the synthetic benchmark to
+see it in live action.
 
 ### DPLL ###
 Below is pseudocode for my DPLL program. Please refer to dpll.py for full
@@ -166,4 +181,24 @@ clause true, therefore overall not satisfied.
 My DPLL implementation is correct and works fine on small instances, but it
 takes way too long on 100-variable 400+ clause instances, therefore I do not
 have the time to run and analyze them. Some dummy stats files are used to
-demonstrate the plotting feature.
+demonstrate the plotting feature, and please run the synthetic benchmark to
+see it in live action.
+
+## Learning Outcome ##
+From this assignment, I have learned three unique algorithms for solving
+satisfiability. In terms of simplicity, I think DPLL is very straightforward
+and elegant. In terms of speed, WalkSAT definitely takes the cake as it's the
+only one that finished. Finally in terms of coolness, genetic algorithm is
+entreating to write as it utilize the concept of evolution in an interesting
+way.
+
+What I also learned from this assignment is that naive implementation of these
+algorithms often cannot find a solution in a reasonable amount of time. For
+future implementations, I would research more about speed-ups and
+short-circuiting techniques that I can use.
+
+Finally, what I learned from this assignment is that parallelism within each
+algorithm might not be benefical, as the overhead of creating multiple
+processes might be longer than if you just execute jobs in sequence.
+However, solving several formulas at once is very handy, as each solve is long
+enough that the overhead of multiprocessing is negated.

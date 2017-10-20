@@ -32,7 +32,7 @@ def get_args():
   parser.add_argument('-f', dest='input_file', action='store', type=str)
   parser.add_argument('--debug', dest='debug', action='store_true', 
                       default=False)
-  parser.add_argument('--lol', dest='lol', action='store_true', 
+  parser.add_argument('--synthetic', dest='synthetic', action='store_true', 
                       default=False)
   parser.add_argument('--verbose', dest='verbose', action='store_true', 
                       default=False)
