@@ -1,6 +1,6 @@
 import os
 import time
-import walkSAT, genetic, dpll
+import walkSAT, genetic, dpll, dpll_new
 import util
 import numpy as np
 from multiprocessing import Pool
@@ -11,10 +11,10 @@ clauses, n_vars = util.get_clauses()
 
 def time_it(n_vars, clauses, algorithm):
   start = time.time()
-  solved, c = algorithm.solve(n_vars, clauses)
+  solved = algorithm.solve(clauses)
   end = time.time()
 
-  return solved, c, end-start
+  return solved, 0, end-start
 
 def ensure_dir(directory):
   if not os.path.exists(directory):
@@ -35,11 +35,11 @@ fname = util.get_csv_name(args.input_file)
 with open(fname, 'w') as f:
   f.write('fitness,time\n')
 
-  for i in range(10):
+  for i in range(1):
     if args.verbose:
       print('[*] Solving %s...' % args.input_file)
 
-    solved, fitness, runtime = time_it(n_vars, clauses, walkSAT)
+    solved, fitness, runtime = time_it(n_vars, clauses, dpll_new)
 
     if args.verbose:
       print('[Y] Max Fit: %3d/%3d | Time: %4.4f seconds | Solved: %s' 

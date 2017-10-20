@@ -1,15 +1,5 @@
 import numpy as np
 
-def clean_var_counts(var_counts):
-  for i in range(1, 101):
-    if i not in var_counts.keys():
-      var_counts[i] = 0
-    
-    if -i not in var_counts.keys():
-      var_counts[-i] = 0
-
-  return var_counts
-
 def get_var_counts(clauses):
   var_counts = {}
 
@@ -20,10 +10,12 @@ def get_var_counts(clauses):
 
       var_counts[var] += 1
 
-  return clean_var_counts(var_counts)
+  return var_counts
 
 def is_pure(var, var_counts):
-  if var_counts[var] and not var_counts[-var]:
+  if -var not in var_counts.keys():
+    return True
+  elif var_counts[var] and not var_counts[-var]:
     return True
   else:
     return False
@@ -41,7 +33,7 @@ def handle_pure(var, clauses):
   new_clauses = []
 
   for clause in clauses:
-    if var not in clauses:
+    if var not in clause:
       new_clauses.append(list(clause))
 
   return new_clauses
@@ -61,9 +53,12 @@ def handle_unit(unit_var, clauses):
     if unit_var in clause:
       continue
 
-    if not_var in clause:
+    elif not_var in clause:
       new_clause = remove_var(not_var, clause)
       new_clauses.append(new_clause)
+
+    else:
+      new_clauses.append(clause)
 
   return new_clauses
 
@@ -82,15 +77,18 @@ def set_true(var, clauses):
   return new_clauses
 
 def solve(clauses):
+  # print('begin')
+  # print(clauses)
   # If we don't have any clauses
   if not len(clauses):
-    return True, 1
+    return True
 
   # If we have an empty clause
   for clause in clauses:
-    if not len(clause):
-      return False, 0
+    if len(clause) == 0:
+      return False
 
+  # Check
   var_counts = get_var_counts(clauses)
 
   has_pure = False
@@ -99,20 +97,44 @@ def solve(clauses):
     if is_pure(var, var_counts):
       has_pure = True
       clauses = handle_pure(var, clauses)
+      # print('after each pure', var)
+      # print(clauses)
 
-  if has_pure:
-    return solve(clauses)
+  # print('after pure')
+  # print(clauses)
+  if has_pure: 
+    if solve(clauses):
+      # print('found pure')
+      return True
+
 
   has_unit = False
   # Handle unit clauses
+  var_counts = get_var_counts(clauses)
   for var in var_counts.keys():
     if is_unit(var, clauses):
       has_unit = True
       clauses = handle_unit(var, clauses)
+      # print('after each unit', var)
+      # print(clauses)
 
+  # print('after unit')
+  # print(clauses)
   if has_unit:
-    return solve(clauses)
+    if solve(clauses):
+      # print('found unit')
+      return True
+
+  # Check again
+  if not len(clauses):
+    return True
+
+  # If we have an empty clause
+  for clause in clauses:
+    if len(clause) == 0:
+      return False
   
+  var_counts = get_var_counts(clauses)
   # Picks a literal to flip
   lucky_var = np.random.choice(var_counts.keys())
 
@@ -120,6 +142,6 @@ def solve(clauses):
   false_clauses = set_true(-lucky_var, clauses)
 
   if solve(true_clauses) or solve(false_clauses):
-    return True, 1
+    return True
   else:
-    return False, 0
+    return False
