@@ -7,7 +7,7 @@ I have implemented three SAT solving algorithms, and they are:
 2. Genetic
 3. DPLL
 
-All solvers are written in python 2.7, using these librariees:
+All solvers are written in python 2.7, using these libraries:
 
 1. numpy (for simplifying some tasks)
 2. matplotlib (for making plots)
@@ -20,11 +20,12 @@ To speed up the solving of the formulas, if you're using linux, you can
 install parallel and parallelize the solving of the formulas. Follow the steps
 below:
 
-1. `cd driver`
-2. Make a text file listing the paths to formula files relative to the root of
+1. `apt-get install parallel`
+2. `cd driver`
+3. Make a text file listing the paths to formula files relative to the root of
    the project folder
-3. `chmod u+x driver.sh runner.sh`
-4. `bash ./driver.sh {input_text_file}`
+4. `chmod u+x driver.sh runner.sh`
+5. `bash ./driver.sh {input_text_file}`
 
 This will start as many jobs as you have CPU cores, replacing a completed job
 with a new one as soon as one is finished.
@@ -33,7 +34,8 @@ Regardless of how you run jobs, there will be three folders created in the
 root of the project folder, `stats_WalkSAT/`, `stats_Genetic/` and
 `stats_DPLL/`.  Each folder represents the method of choice, and within each
 folder will be a bunch of CSVs, whose names will be the names of the CNF
-formula and within each contains runtime and fitness information.
+formula and within each contains runtime and fitness information for the
+specified formula.
 
 Once the three folders are somewhat populated, you can visualize the data you
 collected by running `python visualize.py`, in which 6 plots will be created,
@@ -163,4 +165,5 @@ clause true, therefore overall not satisfied.
 
 My DPLL implementation is correct and works fine on small instances, but it
 takes way too long on 100-variable 400+ clause instances, therefore I do not
-have the time to run and analyze them. 
+have the time to run and analyze them. Some dummy stats files are used to
+demonstrate the plotting feature.
