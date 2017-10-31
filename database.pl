@@ -6,6 +6,8 @@ man(ian).
 man(konan).
 man(munich).
 man(norway).
+man(austin).
+man(andrew).
 
 woman(becky).
 woman(diana).
@@ -27,6 +29,8 @@ child(goodman, becky).
 /* Second row */
 child(jane, captain).
 child(jane, diana).
+child(austin, captain).
+child(austin, diana).
 child(konan, eagle).
 child(konan, french).
 child(munich, goodman).
@@ -36,4 +40,6 @@ child(munich, helen).
 child(norway, ian).
 child(norway, jane).
 child(pam, konan).
-child(pam, lynn)
+child(pam, lynn).
+child(andrew, konan).
+child(andrew, lynn).
