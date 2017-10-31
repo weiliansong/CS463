@@ -6,7 +6,6 @@ man(ian).
 man(konan).
 man(munich).
 man(norway).
-man(olaf).
 
 woman(becky).
 woman(diana).
@@ -18,9 +17,23 @@ woman(queen).
 woman(pam).
 
 /* First row */
-child(captain, aaron).
-child(captain, becky).
-child(french, aaron).
-child(french, becky).
+child(diana, aaron).
+child(diana, becky).
+child(eagle, aaron).
+child(eagle, becky).
 child(goodman, aaron).
 child(goodman, becky).
+
+/* Second row */
+child(jane, captain).
+child(jane, diana).
+child(konan, eagle).
+child(konan, french).
+child(munich, goodman).
+child(munich, helen).
+
+/* Third row */
+child(norway, ian).
+child(norway, jane).
+child(pam, konan).
+child(pam, lynn)
