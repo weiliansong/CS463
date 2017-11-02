@@ -1,22 +1,21 @@
-man(aaron).
-man(captain).
-man(eagle).
-man(goodman).
-man(ian).
-man(konan).
-man(munich).
-man(norway).
-man(austin).
-man(andrew).
+age(aaron, 40).
+age(captain, 30).
+age(eagle, 32).
+age(goodman, 34).
+age(ian, 20).
+age(konan, 23).
+age(munich, 25).
+age(norway, 10).
+age(austin, 22).
+age(andrew, 11).
 
-woman(becky).
-woman(diana).
-woman(french).
-woman(helen).
-woman(jane).
-woman(lynn).
-woman(queen).
-woman(pam).
+age(becky, 41).
+age(diana, 31).
+age(french, 33).
+age(helen, 35).
+age(jane, 21).
+age(lynn, 24).
+age(pam, 12).
 
 /* First row */
 child(diana, aaron).
