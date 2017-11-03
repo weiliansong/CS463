@@ -2,7 +2,7 @@
 
 ## What's here ##
 Within this directory are 5 files.
-1. `database.pl` : geneological database, where only child relations and ages 
+1. `database.pl` : geneological database, where only child relations and ages
    are defined.
 2. `rules.pl` : predicates to determine various family relations.
 3. `main.pl` : sanity script that outputs knowledge base in a neat format.
@@ -26,3 +26,13 @@ Having used Prolog, I think I can program prettier code by limiting myself
 with the number of external libraries I am allowed to use. This way I am less
 relied on outside sources and can fully utilize the power of the programming
 language I'm using.
+
+## Acknowledgements ##
+I would like to thank Thomas Deeter for providing a template script for us to
+test our custom predicates.
+
+I would like to thank Edwin Gogzheyang for discussing with me about family
+relations in general, like what does it mean to be nth cousin k time removed.
+
+Lastly I would like to thank user3633383 on Stack Overflow for giving me hints
+on how to implement the cousin() predicate. Full link to post is: https://stackoverflow.com/questions/30497704/prolog-general-rule-for-finding-cousins-etc. I did not borrow the concept of nth cousin from the post, as I didn't understand it.
