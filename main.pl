@@ -7,6 +7,8 @@ main :-
   kthchild_eval,
   nthcousin_eval,
   sibling_eval,
+  parent_eval,
+  child_eval,
   halt.
 
 % Nth Cousin K Times Removed Evaluation
@@ -64,3 +66,29 @@ sibling_records([],[]).
 sibling_records([A|B], [C|D]) :-
   format('\t~w\t siblings: ~p~n', [A, C]),
   sibling_records(B,D).
+
+% Parent Evaluation
+parent_eval :-
+  findall(C,    setof(P, parent(P,C), List), Cs),
+  findall(List, setof(P, parent(P,C), List), Lists),
+  writeln('Parent Evaluation:'),
+  parent_records(Cs,Lists),
+  writeln('').
+
+parent_records([],[]).
+parent_records([A|B], [C|D]) :-
+  format('\t~w\t parents: ~p~n', [A, C]),
+  parent_records(B,D).
+
+% Child Evaluation
+child_eval :-
+  findall(P,    setof(C, child(C,P), List), Ps),
+  findall(List, setof(C, child(C,P), List), Lists),
+  writeln('Children Evaluation:'),
+  child_records(Ps,Lists),
+  writeln('').
+
+child_records([],[]).
+child_records([A|B], [C|D]) :-
+  format('\t~w\t children: ~p~n', [A, C]),
+  child_records(B,D).
