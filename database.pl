@@ -8,6 +8,7 @@ age(munich, 25).
 age(norway, 10).
 age(austin, 22).
 age(andrew, 11).
+age(zach, 1).
 
 age(becky, 41).
 age(diana, 31).
@@ -16,6 +17,7 @@ age(helen, 35).
 age(jane, 21).
 age(lynn, 24).
 age(pam, 12).
+age(tiffany, 13).
 
 /* First row */
 child(diana, aaron).
@@ -42,3 +44,7 @@ child(pam, konan).
 child(pam, lynn).
 child(andrew, konan).
 child(andrew, lynn).
+
+/* Fourth row */
+child(zach, norway).
+child(zach, tiffany).

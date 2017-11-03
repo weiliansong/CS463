@@ -23,7 +23,7 @@ nthcousinkremoved_eval :-
 
 kremoved_records([],[],[],[]).
 kremoved_records([A|B], [C|D], [E|F], [G|H]) :-
-  format('\t~w\t~dth cousin ~d removed: ~p~n', [A, C, E, G]),
+  format('\t~w\t~d cousin ~d removed: ~p~n', [A, C, E, G]),
   kremoved_records(B,D,F,H).
 
 % Nth Cousin Evaluation
@@ -37,7 +37,7 @@ nthcousin_eval :-
 
 nthcousin_records([],[],[]).
 nthcousin_records([A|B], [C|D], [E|F]) :-
-  format('\t~w\t~dth cousin: ~p~n', [A, C, E]),
+  format('\t~w\t~d cousin: ~p~n', [A, C, E]),
   nthcousin_records(B,D,F).
 
 % Kth Child Evaluation
@@ -51,7 +51,7 @@ kthchild_eval :-
 
 kthchild_records([],[],[]).
 kthchild_records([A|B], [C|D], [E|F]) :-
-  format('\t~w\t~dth child: ~p~n', [A, C, E]),
+  format('\t~w\t~d child: ~p~n', [A, C, E]),
   kthchild_records(B,D,F).
 
 % Sibling Evaluation

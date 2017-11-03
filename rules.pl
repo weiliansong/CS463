@@ -15,7 +15,7 @@ cousin(A,B) :- parent(C,A), parent(D,B), sibling(C,D).
 kthchild(C,P,1) :- child(C,P).
 kthchild(C,P,K) :- child(C_new, P), kthchild(C,C_new,M), K is M+1.
 
-% nthcousin(A,B,0) :- sibling(A,B).
+% nthcousin(A,B,0) :- false.
 nthcousin(A,B,1) :- cousin(A,B).
 nthcousin(A,B,N) :- 
   parent(P_1,A), 
