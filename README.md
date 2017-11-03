@@ -9,6 +9,9 @@ Within this directory are 5 files.
 4. `family_tree.png` : the family tree visualized.
 5. `output.txt` : output of `main.pl` just in case if it can't run.
 
+## How To Run ##
+Simply type `swipl -l main.pl` to print out knowledge base.
+
 ## Learning Outcome ##
 So this assignment is interesting mostly because of the new programming
 language I have to use. Heck it ain't even a full programming language, as its
