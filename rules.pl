@@ -23,5 +23,5 @@ nthcousin(A,B,N) :-
   nthcousin(P_1,P_2,M),
   N is M+1.
 
-nthcousinkremoved(X,Y,N,0) :- nthcousin(X,Y,N).
+% nthcousinkremoved(X,Y,N,0) :- nthcousin(X,Y,N).
 nthcousinkremoved(X,Y,N,K) :- nthcousin(X,Z,N), kthchild(Y,Z,K).
