@@ -5,3 +5,6 @@
 *.brf
 *.toc
 .refresh
+*.pdf
+*.fls
+*.fdb*

@@ -14,6 +14,19 @@
 % run, let it finish, and you should be clear).
 \usepackage[breaklinks=true,bookmarks=false]{hyperref}
 
+\DeclareGraphicsExtensions{.pdf,.jpg,.png,.jpeg}
+\graphicspath{{images/}, {figs/}}
+\newcommand{\todo}[1]{\textcolor{red}{{\em [#1]}} }
+\newcommand{\specialcell}[2][c]{%
+    \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+\newcommand{\secref}[1]{Section~\ref{sec:#1}}
+\newcommand{\figref}[1]{Figure~\ref{fig:#1}}
+\newcommand{\tabref}[1]{Table~\ref{tab:#1}}
+\newcommand{\equref}[1]{Equation~\ref{equ:#1}}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
 \cvprfinalcopy % *** Uncomment this line for the final submission
 
 \def\cvprPaperID{****} % *** Enter the CVPR Paper ID here
@@ -40,22 +53,43 @@ University of Kentucky\\
 \maketitle
 %\thispagestyle{empty}
 
-%%%%%%%%% ABSTRACT
-\begin{abstract}
-  Lol probably not an abstract
-\end{abstract}
-
 %%%%%%%%% BODY TEXT
 \section{Introduction}
 
-Introduction
+Automatic image and video captioning is a relatively new field in the field of
+Machine Learning, where a program can automatically assign a
+sentenced-description of an image, or in the case of a video, for every frame
+of the video. Desite being new, this technology has improved itself over the
+past three years and is widely used in today's world, from auto-generating
+video captions for Youtube videos to clustering images/videos based on their
+captions.
+
+In this survey, we first explore the basic concepts of a nerual image/video
+caption generator, which include topics like Recurrent Neural Networks (RNN),
+Long-Short-Term-Memory (LSTM), and a naive model for performing such task.
+\todo{cite?} We will also explain various evaluation methods that authors use
+to compare their models with others. \todo{figure out their eval methods}
+
+Next we explore two approaches for improving the accuracy of the naive method,
+one through the use of an attention mechanism, and the other through the
+process of dense labelling. Both of these methods are imporved upon in this
+past year's CVPR conference, with new state-of-the-art results within their
+respective field.
+
+At the end, we will look at two papers that has nothing to do with the above
+two approaches, but are very interesting in my opinion and help motivated my
+interest in image and video captioning.
 
 %-------------------------------------------------------------------------
 \section{Background Information}
 
-Background Information
+RNN
 
-Possibly some stuff on RNN in a small section?
+LSTM
+
+Naive model for a captioner
+
+Different evaluation methods, assuming I need to explain them
 
 \section{Attention Mechanism}
 
