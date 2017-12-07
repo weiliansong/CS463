@@ -181,7 +181,7 @@ is $n$ words long. As an example, consider the candidate and reference text in
 \begin{tabular}{ll}
 	Candidate   & the the the the the the the \\
 	Reference 1 & the cat is on the mat       \\
-	Reference 2 & there is a cat on the mat  
+  Reference 2 & there is a cat on the mat  
 \end{tabular}
 \end{table}
 %
@@ -204,6 +204,14 @@ taking a look at each one and compare their results on the COCO dataset.
 \todo{cite COCO here}
 
 \subsection{Knowing When To Look Notes}
+For a typical attention mechanism, it knows what to look, but is forced to
+look every single iterations. Lu et. al. tackle the question of not just
+\textit{where} to look but \textit{when} to look as well. In their proposed
+model, an encoder takes in an input image and outputs a context vector
+$\boldsymbol{c}$, which is the output of a trained image classification
+network and provides visual features for caption generating. $\boldsymbol{c}$
+is then fed into a LSTM unit, followed by a novel attention mechanism and a
+MLP for the final prediction.
 
 \begin{itemize}
   \item The network learns when to pay attention to images and when to pay
