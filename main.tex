@@ -23,6 +23,7 @@
 \newcommand{\figref}[1]{Figure~\ref{fig:#1}}
 \newcommand{\tabref}[1]{Table~\ref{tab:#1}}
 \newcommand{\equref}[1]{Equation~\ref{equ:#1}}
+\newcommand{\matr}[1]{\mathbf{#1}}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -34,7 +35,6 @@
 
 % Pages are numbered in submission mode, and unnumbered in camera-ready
 %\ifcvprfinal\pagestyle{empty}\fi
-\setcounter{page}{4321}
 \begin{document}
 
 %%%%%%%%% TITLE
@@ -76,24 +76,132 @@ process of dense labelling. Both of these methods are imporved upon in this
 past year's CVPR conference, with new state-of-the-art results within their
 respective field.
 
-At the end, we will look at two papers that has nothing to do with the above
-two approaches, but are very interesting in my opinion and help motivated my
-interest in image and video captioning.
+Finally, we will be looking at two very interesting papers that offer a fresh
+look on captioning and piqued my interest in the very beginning.
 
 %-------------------------------------------------------------------------
 \section{Background Information}
 
-RNN
+Before we deep dive into the six papers, some clarifications need to be made
+on various topics.
 
-LSTM
+\subsection{Multilayer Perceptrons}
+\todo{Cite the data science blog post on MLP}
 
-Naive model for a captioner
+Multilayer perceptron, or MLP for short, is the building block to a lot of
+modern neural networks. MLP consists of many layers of neurons, with each
+neuron connecting to every input node and every output node, associating each
+edge with a weight, as shown in \todo{add a MLP figure here}. In a simple,
+non-recurrent MLP, the connected nodes together make an acyclic graph with the
+left side as inputs and right side as outputs. 
 
-Different evaluation methods, assuming I need to explain them
+When we provide an input, each neuron computes a weighted sum of all of its
+inputs based on its weights, and combined with a bias term, the output passes
+through an activation function, which introduces non-linearity, and becomes
+the neuron's output. Connected neurons are then updated as well, until the
+final layer is reached and the output of the neurons will be the network
+outputs. \todo{maybe more information?}
+
+\subsection{Recurrent Neural Networks}
+\todo{Cite deeplearning4j recurrent}
+
+Recurrent Neural Networks, or RNN for short, are a class of neural networks
+that make use of previous network outputs for the next immediate prediction.
+They are able to maintain long-term dependencies between predictions, which is
+useful in fields like nautral language processing, where prediction at the
+current time step requires context, which is obtained through previous
+predictions. 
+
+To define it more formally, assuming we have a recurrent neural network of
+only one layer with input $\matr{x}$, layer weights $W$, and output
+$\boldsymbol{y}_{t-1}$ at time step $t-1$, we can define our network output
+$\boldsymbol{y}$ at time step $t$ as:
+%
+\begin{equation}
+  \boldsymbol{y}_t = \phi (W \matr{x_t} + U \boldsymbol{y}_{t-1})
+\end{equation}
+%
+where $\phi$ is an activation function that squashes the values in the
+parentheses into a specified range, and $U$ is the transition matrix between
+hidden states and the concept of hidden-states to hidden-states is similar to
+a Markov chain.
+
+As we can see, our network output at timestep $t$ is depend upon the regular
+feedforward section of the network $W \matr{x_{t}}$ and some information about
+its past outputs, which is obtained with $U \boldsymbol{y}_{t-1}$. $U$ is a
+learnable matrix that learns what and how much previous outputs should the
+network apply to the immediate future prediction.
+
+Extending this simple example to a network with multiple and different types
+of layers, our layer's output will not be $\boldsymbol{y}$ anymore, instead it
+will become hidden, not directly observable, which we denote as
+$\boldsymbol{h}$. The rest of the equation remains the same, and multiple
+recurrent neural layers can be stacked to learn more complex 
+
+When backpropagating the error through the network and updating the learnable
+parameters of the recurrent layers, the gradient calculation is comparable to
+a feed-forward network, except the fact that the layer's output is the result
+of a series of chain rules. Calculus is again used but no special exceptions
+are made for recurrent layers.
+
+One major issue with vanilla RNNs is that during training, the weights of a
+recurrent layer can change too rapidly from optimization, and the gradient,
+the rate of change of weights, can also change too rapidly, causing each step
+afterwards to amplify the change, and evantually either explodes or vanishes.
+This is known as the vanishing or exploding gradient problem, and because of
+it LSTM units are born.
+
+\subsection{Long Short-Term Memory Units}
+\todo{Cite colah's guide on LSTM}
+
+Long Short-Term Memory units, or LSTM for short, is a special kind of
+recurrent neural layer. Instead of only using $U$ to determine what
+information to keep between states, it uses a series of gates to learn what to
+remember from the previous state, use the information obtained, and decides
+what to forget so the next state can have the most useful information.
+\todo{explain more about LSTMs here}
+
+\subsection{Evaluation Methods}
+For a given image, there usually are several reference captions that the
+network can try to predict. For evaluation of image/video captioning systems,
+we will be looking mainly at three today: BLEU, METEOR and CIDEr.
+
+\paragraph{BLEU}
+BLEU aims at computing the similarity between the candidate (predicted)
+sentences and all reference sentences by finding the maximum number of
+appearances of $n$-grams of one candidate sentence inside the corresponding
+reference sentences.  \todo{sounds weird} An $n$-gram is any given phrase that
+is $n$ words long. As an example, consider the candidate and reference text in
+\tabref{captions}:
+%
+\begin{table}[]
+\centering
+\caption{Example candidate and reference captions}
+\label{tab:captions}
+\begin{tabular}{ll}
+	Candidate   & the the the the the the the \\
+	Reference 1 & the cat is on the mat       \\
+	Reference 2 & there is a cat on the mat  
+\end{tabular}
+\end{table}
+%
+If we are to compute the 1-gram BLEU score (BLEU-1), it would be $2/7$, as the
+only 1-gram ``the'' in candidate appears a maximum of two times in Reference
+2.
+
+\paragraph{METEOR}
+
+
+\paragraph{CIDEr}
 
 \section{Attention Mechanism}
 
-Attention Mechanism
+The use of an attention mechanism has become popular in image and video
+captioning, as it assists the neural network to extract more useful
+information by focusing its attention to only parts of the input. Below are
+two different attention mechanisms introduced in CVPR 2017, and we will be
+taking a look at each one and compare their results on the COCO dataset.
+\todo{cite COCO here}
 
 \subsection{Knowing When To Look Notes}
 
