@@ -25,6 +25,7 @@
 \newcommand{\equref}[1]{Equation~\ref{equ:#1}}
 \newcommand{\matr}[1]{\mathbf{#1}}
 \newcommand{\bfit}[1]{\mathbf{\mathit{#1}}}
+\newcommand{\bs}[1]{\boldsymbol{#1}}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -115,11 +116,11 @@ predictions.
 
 To define it more formally, assuming we have a recurrent neural network of
 only one layer with input $\matr{x}$, layer weights $W$, and output
-$\boldsymbol{y}_{t-1}$ at time step $t-1$, we can define our network output
-$\boldsymbol{y}$ at time step $t$ as:
+$\bs{y}_{t-1}$ at time step $t-1$, we can define our network output
+$\bs{y}$ at time step $t$ as:
 %
 \begin{equation}
-  \boldsymbol{y}_t = \phi (W \matr{x_t} + U \boldsymbol{y}_{t-1})
+  \bs{y}_t = \phi (W \matr{x_t} + U \bs{y}_{t-1})
 \end{equation}
 %
 where $\phi$ is an activation function that squashes the values in the
@@ -129,14 +130,14 @@ a Markov chain.
 
 As we can see, our network output at timestep $t$ is depend upon the regular
 feedforward section of the network $W \matr{x_{t}}$ and some information about
-its past outputs, which is obtained with $U \boldsymbol{y}_{t-1}$. $U$ is a
+its past outputs, which is obtained with $U \bs{y}_{t-1}$. $U$ is a
 learnable matrix that learns what and how much previous outputs should the
 network apply to the immediate future prediction.
 
 Extending this simple example to a network with multiple and different types
-of layers, our layer's output will not be $\boldsymbol{y}$ anymore, instead it
+of layers, our layer's output will not be $\bs{y}$ anymore, instead it
 will become hidden, not directly observable, which we denote as
-$\boldsymbol{h}$. The rest of the equation remains the same, and multiple
+$\bs{h}$. The rest of the equation remains the same, and multiple
 recurrent neural layers can be stacked to learn more complex 
 
 When backpropagating the error through the network and updating the learnable
@@ -204,22 +205,22 @@ two different attention mechanisms introduced in CVPR 2017, and we will be
 taking a look at each one and compare their results on the COCO dataset.
 \todo{cite COCO here}
 
-\subsection{Knowing When To Look Notes}
-For a typical attention mechanism, it knows what to look, but is forced to look
-somewhere all the time. Lu et. al. tackle the question of not just
-\textit{where} to look but \textit{when} to look as well. In their proposed
-model, an encoder takes in an input image and outputs a context vector
-$\boldsymbol{c}_t$, which is the output of a trained image classification network
-and provides visual features for caption generating. $\boldsymbol{c}_t$ is then
-fed into a LSTM unit, followed by a novel attention mechanism and a MLP for the
-final prediction. \todo{maybe a diagram here? Also this is wrong}
+\subsection{Knowing When To Look}
+For a typical attention mechanism, it knows what to look, but is forced to
+look all the time. Lu et.\ al.\ tackle the question of not just \textit{where}
+to look but \textit{when} to look as well. In their proposed model, an encoder
+takes in an input image and outputs a context vector $\bs{c}_t$, which
+is the output of a trained image classification network and provides visual
+features for caption generating. $\bs{c}_t$ is then fed into a LSTM
+unit, followed by a novel attention mechanism and a MLP for the final
+prediction. \todo{maybe a diagram here? Also this is wrong}
 
 The novel attention mechanism that Lu et. al. introduces is a variation of
 soft attention model from ??? \todo{cite}. To compute the context vector
-$\boldsymbol{c}_t$, they define it as:
+$\bs{c}_t$, they define it as:
 %
 \begin{equation}
-  \boldsymbol{c}_t = g(\matr{V}, \boldsymbol{h}_t)
+  \bs{c}_t = g(\matr{V}, \bs{h}_t)
 \end{equation}
 %
 where $\matr{V} = [\mathbf{v}_1,\dots,\mathbf{v}_k], \mathbf{v}_i \in R^d$
@@ -228,38 +229,50 @@ area having $d$ dimensions. $g$ is the attention mechanism the author
 proposes, which is a single layer neural network computing the attention
 distrubtion of the $k$ areas of the image:
 %
-\begin{equation}
-  \matr{z}_t = \matr{w}_h^T \tanh(\matr{W}_v \matr{V} + \matr{W}_g \matr{h}_t)
-\end{equation}
-%
-\begin{equation}
-  \alpha_t = \operatorname{softmax}(\matr{z}_t)
-\end{equation}
+\begin{align}
+  \matr{z}_t &= \matr{w}_h^T \tanh(\matr{W}_v \matr{V} + \matr{W}_g \matr{h}_t) \\
+  \alpha_t   &= \operatorname{softmax}(\matr{z}_t)
+\end{align}
 %
 where \todo{a lot of explaining here...}, and $\alpha \in R^k$ is the
 attention weight over $k$ areas of the image feature $\matr{V}$. With
 $\alpha_t$, we can compute the context vector as:
 %
 \begin{equation}
-  \boldsymbol{c}_t = \sum_{i=1}^k \alpha_{ti} \boldsymbol{v}_{ti}
+  \bs{c}_t = \sum_{i=1}^k \alpha_{ti} \bs{v}_{ti}
 \end{equation}
 %
 and finally we have a MLP layer $f$ that computes the probability distribution
 over words:
 %
 \begin{equation}
-  \log p(y_t | y_1,\dots,y_{t-1},I) = f(\boldsymbol{h}_t, \boldsymbol{c}_t)
+  \log p(y_t | y_1,\dots,y_{t-1},I) = f(\bs{h}_t, \bs{c}_t)
 \end{equation}
 %
-Overview of the network from the literature is shown in ???.
-\begin{itemize}
-  \item The network learns when to pay attention to images and when to pay
-        attention to learned words. Uses gate $g_t$, which is learnable
-  \item Novel attention mechanism for visual learning, inspired by success in
-        residual learning. Different from other methods, as LSTM's cell state
-        is used for learning
-  \item Extensive evaluation on the visuan sentinel and the attention mechanism
-\end{itemize}
+Overview of the attention network is shown in ???, which is borrowed from the
+original text.
+
+Authors also propose a method for allowing the network to choose features
+produced by the attention system or another set of features
+$\bs{s}_t$, the ``visual sentinel''. It is calculated as follows:
+%
+\begin{align}
+  \bs{g}_t &= \sigma (\bfit{W}_x \bs{x}_t + \bfit{W}_h \bs{h}_{t-1} \\
+  \bs{s}_t &= \bs{g}_t \odot \tanh (\bs{m}_t)
+\end{align}
+%
+where $\bfit{W}_x$ and $\bfit{W}_h$ are again weights to be learned and
+$\bs{m}_t$ is the LSTM cell state. Combining with the attention
+mechanism output $\bs{c}_t$, we have:
+%
+\begin{equation}
+  \hat{\bs{c}}_t = \beta_t \bs{s}_t + (1 - \beta_t) \bs{c}_t
+\end{equation}
+%
+where $\beta_t$ is our sentinel gate and is between 0 and 1 to control how
+much information to use from each. When $\beta_t=1$, we essentially turn
+off the attention mechanism and only use the visual sentinel feature, vice
+versa. \todo{maybe explain that it's inspired by residual nets}
 
 \subsection{Areas of Attention for Image Captioning}
 
