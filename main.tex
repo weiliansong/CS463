@@ -24,6 +24,7 @@
 \newcommand{\tabref}[1]{Table~\ref{tab:#1}}
 \newcommand{\equref}[1]{Equation~\ref{equ:#1}}
 \newcommand{\matr}[1]{\mathbf{#1}}
+\newcommand{\bfit}[1]{\mathbf{\mathit{#1}}}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -187,7 +188,7 @@ is $n$ words long. As an example, consider the candidate and reference text in
 %
 If we are to compute the 1-gram BLEU score (BLEU-1), it would be $2/7$, as the
 only 1-gram ``the'' in candidate appears a maximum of two times in Reference
-2.
+2. 
 
 \paragraph{METEOR}
 
@@ -204,15 +205,53 @@ taking a look at each one and compare their results on the COCO dataset.
 \todo{cite COCO here}
 
 \subsection{Knowing When To Look Notes}
-For a typical attention mechanism, it knows what to look, but is forced to
-look every single iterations. Lu et. al. tackle the question of not just
+For a typical attention mechanism, it knows what to look, but is forced to look
+somewhere all the time. Lu et. al. tackle the question of not just
 \textit{where} to look but \textit{when} to look as well. In their proposed
 model, an encoder takes in an input image and outputs a context vector
-$\boldsymbol{c}$, which is the output of a trained image classification
-network and provides visual features for caption generating. $\boldsymbol{c}$
-is then fed into a LSTM unit, followed by a novel attention mechanism and a
-MLP for the final prediction.
+$\boldsymbol{c}_t$, which is the output of a trained image classification network
+and provides visual features for caption generating. $\boldsymbol{c}_t$ is then
+fed into a LSTM unit, followed by a novel attention mechanism and a MLP for the
+final prediction. \todo{maybe a diagram here? Also this is wrong}
 
+The novel attention mechanism that Lu et. al. introduces is a variation of
+soft attention model from ??? \todo{cite}. To compute the context vector
+$\boldsymbol{c}_t$, they define it as:
+%
+\begin{equation}
+  \boldsymbol{c}_t = g(\matr{V}, \boldsymbol{h}_t)
+\end{equation}
+%
+where $\matr{V} = [\mathbf{v}_1,\dots,\mathbf{v}_k], \mathbf{v}_i \in R^d$
+\todo{fix real numbers} is the image feature divided into $k$ areas and each
+area having $d$ dimensions. $g$ is the attention mechanism the author
+proposes, which is a single layer neural network computing the attention
+distrubtion of the $k$ areas of the image:
+%
+\begin{equation}
+  \matr{z}_t = \matr{w}_h^T \tanh(\matr{W}_v \matr{V} + \matr{W}_g \matr{h}_t)
+\end{equation}
+%
+\begin{equation}
+  \alpha_t = \operatorname{softmax}(\matr{z}_t)
+\end{equation}
+%
+where \todo{a lot of explaining here...}, and $\alpha \in R^k$ is the
+attention weight over $k$ areas of the image feature $\matr{V}$. With
+$\alpha_t$, we can compute the context vector as:
+%
+\begin{equation}
+  \boldsymbol{c}_t = \sum_{i=1}^k \alpha_{ti} \boldsymbol{v}_{ti}
+\end{equation}
+%
+and finally we have a MLP layer $f$ that computes the probability distribution
+over words:
+%
+\begin{equation}
+  \log p(y_t | y_1,\dots,y_{t-1},I) = f(\boldsymbol{h}_t, \boldsymbol{c}_t)
+\end{equation}
+%
+Overview of the network from the literature is shown in ???.
 \begin{itemize}
   \item The network learns when to pay attention to images and when to pay
         attention to learned words. Uses gate $g_t$, which is learnable
