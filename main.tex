@@ -276,12 +276,50 @@ versa. \todo{maybe explain that it's inspired by residual nets}
 
 \subsection{Areas of Attention for Image Captioning}
 
-Pedersoli et.\ al.\ proposes a novel attention mechanism where the
-distribution over words $w_t$ generated at time $t$ depends not only on $h_t$
-the hidden state of a RNN, but also depends on image regions of interest
-$r_t$. Authors experimented with different types of $r_t$, including
-activation grids (fixed size grids over image), object proposals (object
-bounding boxes), and spatial transformers (activation grids transformed).
+Pedersoli et.\ al.\ proposes a novel attention mechanism that associates
+areas of interest when generating captions. When predicting the word at each
+time step, the network learns the relationship between the predicted words,
+areas of interest, and the hidden state of the RNN through a triangular
+relationship. \todo{make a triangle figure here}. For comparison, a vanilla
+RNN model for image captioning only finds the relationship between words and
+the hidden state of the RNN.
+
+The network that Pedersoli et.\ al.\ proposes is a modified CNN-RNN network,
+using VGG16 as its CNN and gated recurrent units (GRU) instead of LSTM for its
+RNN part. Details of GRU won't be discussed in this survey, but it is similar
+to a LSTM unit. After that there are three main learnable parameters,
+$\theta_{wh}$, $\theta_{wr}$, $\theta_{rh}$. Slightly modifying the authors'
+equations, we can compute the joint distribution over words and image regions
+as follows:
+%
+\begin{equation}
+  \begin{aligned}
+    p(w_t, r_t|h_t) &\propto \exp s(w_t, r_t, h_t) \\
+    s(w_t, r_t, h_t) &= f(w_t, h_t, \theta_{wh}, W) \\
+                     &+ f(w_t, r_t, \theta_{wr}, W, R) \\
+                     &+ f(r_t, h_t, \theta_{rh}, R) \\
+                     &+ bias
+  \end{aligned}
+\end{equation}
+%
+where $r_t$ encodes the image regions the network attends to at time $t$ and
+$(W,R)$ are word and region representations. As we can see, $s(w_t, r_t, h_t)$
+is the summation of three terms, computing the relationship between words and
+hidden state, words and image regions, and image regions and hidden state,
+respectfully. The last term is a linear bias that is learnable by the network.
+
+Given the hidden cell state, the predicted word at time $t$ is computed
+through the word distribution $p(w_t|h_t) = \sum_{r_t} p(w_t,r_t|h_t)$. The
+authors also utilize the predicted probability distribution over regions
+$p(r_t|h_t)$ to provide a feedback signal to the RNN for the next word
+prediction, which they denote as $v$. A complete overview of the network can
+be seen in figure ??? from the original paper. \todo{add it here}
+
+In regards to the image regions $r$, authors have experimented with three
+different types: activation grid (fixed size square bounding boxes), object
+proposals (bounding boxes around objects), and spatial transformers
+(transformed activation grids). The image regions are obtained from outputs of
+the last few layers of VGG16 during training.
 
 \section{Dense Labeling}
 
