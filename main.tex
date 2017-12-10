@@ -276,13 +276,12 @@ versa. \todo{maybe explain that it's inspired by residual nets}
 
 \subsection{Areas of Attention for Image Captioning}
 
-\begin{itemize}
-  \item Uses regions of image to predict the next word, and uses predicted
-        regions in the next state of the RNN cell.
-  \item Have three different types of regions of interest. Either grid, object
-        bounding box, or spatial transformers.
-  \item Uses VGG16
-\end{itemize}
+Pedersoli et.\ al.\ proposes a novel attention mechanism where the
+distribution over words $w_t$ generated at time $t$ depends not only on $h_t$
+the hidden state of a RNN, but also depends on image regions of interest
+$r_t$. Authors experimented with different types of $r_t$, including
+activation grids (fixed size grids over image), object proposals (object
+bounding boxes), and spatial transformers (activation grids transformed).
 
 \section{Dense Labeling}
 
