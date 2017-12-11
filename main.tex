@@ -237,12 +237,17 @@ their results on a common dataset.
 \subsection{Knowing When To Look}
 Lu et.\ al.\ proposes a novel mechanism that learns not only \textit{what} to
 look but \textit{when} as well. Their model extends the CNN-RNN model,
-using LSTM as their RNN of choice and modifying various parts to include their
-custom attention mechanism. During each training iteration, the network can
-choose to attend to certain regions of the image, or choose to use the visual
-sentinel feature, which is calculated from the LSTM input, hidden state, and
-cell state.
+using LSTM as their RNN of choice and inserting their attention mechanism in
+between the CNN and RNN.
 
+To allow the network learn when to focus on specific regions and when to look
+at image in big picture, the authors propose a different input to the RNN
+$\hat{c}_t$, where
+%
+\begin{equation}
+  \hat{c}_t = \beta_t \bm{s}_t + (1 - \beta_t) \bm{c}_t
+\end{equation}
+%
 In their proposed model, an
 encoder takes in an input image and outputs a context vector $\bs{c}_t$, which
 is the output of a trained image classification network and provides visual
