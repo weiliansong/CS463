@@ -45,7 +45,7 @@
 \begin{document}
 
 %%%%%%%%% TITLE
-\title{Survey On Image and Video Captioning}
+\title{Survey on Recent Image and Video Captioning}
 
 \author{Weilian Song\\
 University of Kentucky\\
@@ -192,7 +192,7 @@ the cell at timestep $t+1$, and the process repeats.
 \subsection{Evaluation Methods}
 
 For evaluation of image/video captioning systems, there are three popular
-metrics: BLEU, METEOR and CIDEr.
+metrics: BLEU, METEOR and CIDEr. \todo{cite the three metrics}
 
 \paragraph{BLEU}
 BLEU aims at computing the similarity percentage between the candidate
@@ -235,103 +235,125 @@ introduced in CVPR 2017, and we will be taking a look at each one and compare
 their results on a common dataset.
 
 \subsection{Knowing When To Look}
-Lu et.\ al.\ proposes a novel mechanism that learns not only \textit{what} to
-look but \textit{when} as well. Their model extends the CNN-RNN model,
-using LSTM as their RNN of choice and inserting their attention mechanism in
-between the CNN and RNN.
+Lu et.\ al.\cite{attentionwhen} proposes a novel mechanism that learns not only
+\textit{what} to look but \textit{when} as well. If the model chooses to not
+attend to the image, it uses the language model stored in the RNN instead.
+The proposed network extends the CNN-RNN model, using ResNet \cite{resnet} as
+their CNN network, LSTM as their RNN of choice and inserting their attention
+mechanism in between the CNN and RNN.
 
-To allow the network learn when to focus on specific regions and when to look
-at image in big picture, the authors propose a different input to the RNN
-$\hat{c}_t$, where
+For the network to learn when to focus on specific regions and when to refer
+to the language model, the authors propose a new context vector $\hat{c}_t$ to
+be used for the RNN, calculated as follows, borrowing equation from
+\cite{attentionwhen}:
 %
 \begin{equation}
-  \hat{c}_t = \beta_t \bm{s}_t + (1 - \beta_t) \bm{c}_t
+  \hat{\bm{c}}_t = \beta_t \bm{s}_t + (1 - \beta_t) \bm{c}_t
 \end{equation}
 %
-In their proposed model, an
-encoder takes in an input image and outputs a context vector $\bs{c}_t$, which
-is the output of a trained image classification network and provides visual
-features for caption generating.  $\bs{c}_t$ is then fed into a LSTM unit,
-followed by a novel attention mechanism and a MLP for the final prediction.
-\todo{maybe a diagram here? Also
-this is wrong}
+with $\bm{s}_t$ being the visual sentinel (language model), $\bm{c}_t$ being
+the attention-focused image feature, and $0 \le \beta_t \le 1$ as the gate
+parameter that controls the mixture of the two features. When $\beta_t=1$, the
+network would have essentially turned the attention mechanism off and use only
+the visual sentinel features, and vice versa.
 
-The novel attention mechanism that Lu et. al. introduces is a variation of
-soft attention model from ??? \todo{cite}. To compute the context vector
-$\bs{c}_t$, they define it as:
-%
-\begin{equation}
-  \bs{c}_t = g(\matr{V}, \bs{h}_t)
-\end{equation}
-%
-where $\matr{V} = [\mathbf{v}_1,\dots,\mathbf{v}_k], \mathbf{v}_i \in R^d$
-\todo{fix real numbers} is the image feature divided into $k$ areas and each
-area having $d$ dimensions. $g$ is the attention mechanism the author
-proposes, which is a single layer neural network computing the attention
-distrubtion of the $k$ areas of the image:
-%
-\begin{align}
-  \matr{z}_t &= \matr{w}_h^T \tanh(\matr{W}_v \matr{V} + \matr{W}_g \matr{h}_t) \\
-  \alpha_t   &= \operatorname{softmax}(\matr{z}_t)
-\end{align}
-%
-where \todo{a lot of explaining here...}, and $\alpha \in R^k$ is the
-attention weight over $k$ areas of the image feature $\matr{V}$. With
-$\alpha_t$, we can compute the context vector as:
-%
-\begin{equation}
-  \bs{c}_t = \sum_{i=1}^k \alpha_{ti} \bs{v}_{ti}
-\end{equation}
-%
-and finally we have a MLP layer $f$ that computes the probability distribution
-over words:
-%
-\begin{equation}
-  \log p(y_t | y_1,\dots,y_{t-1},I) = f(\bs{h}_t, \bs{c}_t)
-\end{equation}
-%
-Overview of the attention network is shown in ???, which is borrowed from the
-original text.
+The visual sentinel $\bm{s}_t$ is calculated as a function of the LSTM input
+$\bm{x}_t$, hidden state $\bm{h}_t$, and cell state $\bm{m}_t$. The
+attention-focused image feature $\bm{c}_t$ is calculated as a weighted sum of
+image spatial features $\bm{V}$, with the weights learnable and dependent on
+$\bm{V}$ and $\bm{h}_t$. $\bm{V}$ is obtained from the last layer of ResNet
+\cite{resnet} followed by a single layer perceptron.
 
-Authors also propose a method for allowing the network to choose features
-produced by the attention system or another set of features
-$\bs{s}_t$, the ``visual sentinel''. It is calculated as follows:
-%
-\begin{align}
-  \bs{g}_t &= \sigma (\bfit{W}_x \bs{x}_t + \bfit{W}_h \bs{h}_{t-1} \\
-  \bs{s}_t &= \bs{g}_t \odot \tanh (\bs{m}_t)
-\end{align}
-%
-where $\bfit{W}_x$ and $\bfit{W}_h$ are again weights to be learned and
-$\bs{m}_t$ is the LSTM cell state. Combining with the attention
-mechanism output $\bs{c}_t$, we have:
-%
-\begin{equation}
-  \hat{\bs{c}}_t = \beta_t \bs{s}_t + (1 - \beta_t) \bs{c}_t
-\end{equation}
-%
-where $\beta_t$ is our sentinel gate and is between 0 and 1 to control how
-much information to use from each. When $\beta_t=1$, we essentially turn
-off the attention mechanism and only use the visual sentinel feature, vice
-versa. \todo{maybe explain that it's inspired by residual nets}
+% In their proposed model, an encoder takes in an input image and outputs a
+% context vector $\bs{c}_t$, which is the output of a trained image
+% classification network and provides visual features for caption generating.
+% $\bs{c}_t$ is then fed into a LSTM unit, followed by a novel attention
+% mechanism and a MLP for the final prediction.  \todo{maybe a diagram here?
+% Also this is wrong}
+% 
+% The novel attention mechanism that Lu et. al. introduces is a variation of
+% soft attention model from ??? \todo{cite}. To compute the context vector
+% $\bs{c}_t$, they define it as:
+% %
+% \begin{equation}
+%   \bs{c}_t = g(\matr{V}, \bs{h}_t)
+% \end{equation}
+% %
+% where $\matr{V} = [\mathbf{v}_1,\dots,\mathbf{v}_k], \mathbf{v}_i \in R^d$
+% \todo{fix real numbers} is the image feature divided into $k$ areas and each
+% area having $d$ dimensions. $g$ is the attention mechanism the author
+% proposes, which is a single layer neural network computing the attention
+% distrubtion of the $k$ areas of the image:
+% %
+% \begin{align}
+%   \matr{z}_t &= \matr{w}_h^T \tanh(\matr{W}_v \matr{V} + \matr{W}_g \matr{h}_t) \\
+%   \alpha_t   &= \operatorname{softmax}(\matr{z}_t)
+% \end{align}
+% %
+% where \todo{a lot of explaining here...}, and $\alpha \in R^k$ is the
+% attention weight over $k$ areas of the image feature $\matr{V}$. With
+% $\alpha_t$, we can compute the context vector as:
+% %
+% \begin{equation}
+%   \bs{c}_t = \sum_{i=1}^k \alpha_{ti} \bs{v}_{ti}
+% \end{equation}
+% %
+% and finally we have a MLP layer $f$ that computes the probability distribution
+% over words:
+% %
+% \begin{equation}
+%   \log p(y_t | y_1,\dots,y_{t-1},I) = f(\bs{h}_t, \bs{c}_t)
+% \end{equation}
+% %
+% Overview of the attention network is shown in ???, which is borrowed from the
+% original text.
+% 
+% Authors also propose a method for allowing the network to choose features
+% produced by the attention system or another set of features
+% $\bs{s}_t$, the ``visual sentinel''. It is calculated as follows:
+% %
+% \begin{align}
+%   \bs{g}_t &= \sigma (\bfit{W}_x \bs{x}_t + \bfit{W}_h \bs{h}_{t-1} \\
+%   \bs{s}_t &= \bs{g}_t \odot \tanh (\bs{m}_t)
+% \end{align}
+% %
+% where $\bfit{W}_x$ and $\bfit{W}_h$ are again weights to be learned and
+% $\bs{m}_t$ is the LSTM cell state. Combining with the attention
+% mechanism output $\bs{c}_t$, we have:
+% %
+% \begin{equation}
+%   \hat{\bs{c}}_t = \beta_t \bs{s}_t + (1 - \beta_t) \bs{c}_t
+% \end{equation}
+% %
+% where $\beta_t$ is our sentinel gate and is between 0 and 1 to control how
+% much information to use from each. When $\beta_t=1$, we essentially turn
+% off the attention mechanism and only use the visual sentinel feature, vice
+% versa. \todo{maybe explain that it's inspired by residual nets}
 
 \subsection{Areas of Attention for Image Captioning}
 
-Pedersoli et.\ al.\ proposes a novel attention mechanism that associates
-areas of interest when generating captions. When predicting the word at each
-time step, the network learns the relationship between the predicted words,
-areas of interest, and the hidden state of the RNN through a triangular
-relationship. \todo{make a triangle figure here}. For comparison, a vanilla
-RNN model for image captioning only finds the relationship between words and
-the hidden state of the RNN.
-
-The network that Pedersoli et.\ al.\ proposes is a modified CNN-RNN network,
-using VGG16 as its CNN and gated recurrent units (GRU) instead of LSTM for its
-RNN part. Details of GRU won't be discussed in this survey, but it is similar
-to a LSTM unit. After that there are three main learnable parameters,
-$\theta_{wh}$, $\theta_{wr}$, $\theta_{rh}$. Slightly modifying the authors'
-equations, we can compute the joint distribution over words and image regions
-as follows:
+Pedersoli et.\ al.\cite{attentionwhere} proposes a novel attention mechanism
+that associates areas of interest when generating captions. When predicting
+the word at each time step, the network learns the relationship between the
+predicted words, areas of interest, and the hidden state of the RNN through a
+triangular relationship, as shown in \figref{triangle}.
+%
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{traingle}
+  \caption{Triangular relationship between predicted words (top), image
+  regions (bottom left), and hidden state of GRU (bottom right)}
+  \label{fig:triangle}
+\end{figure}
+%
+For comparison, a vanilla RNN model for image captioning only finds the
+relationship between words and the hidden state of the RNN.
+  
+The proposed network is a modified CNN-RNN network, using VGG16 as its CNN and
+gated recurrent units (GRU), which are similar to LSTM units. There are three
+main learnable parameters within the network, $\theta_{wh}$, $\theta_{wr}$,
+and $\theta_{rh}$.  Simplifying the equations shown in \cite{attentionwhere},
+we can compute the joint distribution over words and image regions as follows:
 %
 \begin{equation}
   \begin{aligned}
@@ -344,19 +366,17 @@ as follows:
 \end{equation}
 %
 where $r_t$ encodes the image regions the network attends to at time $t$ and
-$(W,R)$ are word and region representations. As we can see, $s(w_t, r_t, h_t)$
-is the summation of three terms, computing the relationship between words and
-hidden state, words and image regions, and image regions and hidden state,
-respectfully. The last term is a linear bias that is learnable by the network.
+$W,R$ are word and region representations. Function $s(w_t, r_t, h_t)$ is the
+summation of three terms, computing the relationship between words and hidden
+state, words and image regions, and image regions and hidden state,
+respectively. The last term is a linear bias that is learnable by the network.
 
 Given the hidden cell state, the predicted word at time $t$ is computed
 through the word distribution $p(w_t|h_t) = \sum_{r_t} p(w_t,r_t|h_t)$. The
 authors also utilize the predicted probability distribution over regions
 $p(r_t|h_t)$ to provide a feedback signal to the RNN for the next word
 prediction, which they denote as $v$. It is a form of weakly-supervised
-learning, as in the network is using its own predictions as labels or truths
-to train on. A complete overview of the network can be seen in figure ??? from
-the original paper. \todo{add it here}
+learning, as in the network is using its own predictions as labels to train.
 
 In regards to the image regions $r$, authors have experimented with three
 different types: activation grid (fixed size square bounding boxes), object
@@ -366,15 +386,15 @@ the last few layers of VGG16 during training.
 
 \subsection{Attention Mechanisms Evaluation}
 \tabref{attention} shows the evaluation of the two attention mechanisms using
-COCO, the largest image captioning dataset from Microsoft. Lu et.\ al.'s
-knowing \textit{when} to look attention mechanism outperforms Pedersoli et.\
-al.'s knowing \textit{what} to look attention mechanism. It is worth noting
-that Pedersoli et.\ al.\ does not claim that they are the state-of-the-art,
-but the new mechanism that the authors have proposed can be integrated into a
-lot of existing state-of-the-art networks. Lu et.\ al.\ also analyzed their
-network's ability to learn \textit{where} to attend, however the evaluation is
-minimal compared to Pedersoli et.\ al.'s method, so it would be very
-interesting to combine the two methods to see how it performs.
+COCO \cite{coco}, the largest image captioning dataset from Microsoft. Lu et.\
+al.'s knowing \textit{when} to look attention mechanism outperforms Pedersoli
+et.\ al.'s knowing \textit{where} to look attention mechanism. It is worth
+noting that Pedersoli et.\ al.\ does not claim that they are the
+state-of-the-art, but the new mechanism that the authors have proposed can be
+integrated into a lot of existing state-of-the-art networks. Lu et.\ al.\ also
+analyzed their network's ability to learn \textit{where} to attend, however the
+evaluation is minimal compared to Pedersoli et.\ al.'s method, so it would be
+very interesting to combine the two methods to see how it performs.
 %
 \begin{table}[]
 \centering
