@@ -1,4 +1,7 @@
 \documentclass[12pt,onecolumn,letterpaper,draftclsnofoot]{article}
+\documentstyle[12pt]{article}
+
+\usepackage{fullpage}
 
 \usepackage{cvpr}
 \usepackage{times}
@@ -71,7 +74,7 @@ years and is widely used in today's world, from automatically generating video
 captions for Youtube videos to clustering images/videos based on their
 captions.
 
-In this survey, we first explore the basic concepts of a nerual image/video
+In this survey, we will introduce basic concepts of a nerual image/video
 caption generator, which include topics like Recurrent Neural Networks (RNN),
 Long-Short-Term-Memory (LSTM), and a baseline model in which researchers
 expand upon. We will also explain various evaluation methods that researchers
@@ -82,9 +85,6 @@ of an attention mechanism, and the other through the process of dense
 labelling. Four recent papers from CVPR and ICCV are chosen as
 representatives, two for each expansions. Each pair utilizes the same general
 concepts, but are different in their approach.
-
-Finally, we will be looking at two very interesting papers that offer a fresh
-look on captioning and piqued my interest in the very beginning.
 
 %-------------------------------------------------------------------------
 \section{Background Information}
@@ -412,11 +412,27 @@ very interesting to combine the two methods to see how it performs.
 %
 \section{Dense Labeling}
 
-Dense labeling
+While one caption for one image/video is a remarkable step for neural networks
+in imagery understanding, it forces the network output to be of global
+context. For example, a picture of a park with lots of people in it would most
+likely have a caption of ``People of all ages are enjoying themselves in a
+park.'' While it summarizes the image very well, it is limited to only
+summaries and no specific information like ``A group of teenagers are playing
+soccer'' or ``The weather is very nice today''.
 
-\section{Miscellaneous}
+This is where dense labeling comes in, where for a given image and bounding
+boxes, the network learns to caption the image content in each bounding box.
+In the case of a video, the bounding box can move with an object throughout
+the frames, and the network outputs several captions for one video.
 
-Miscellaneous papers I want to talk about
+First introduced by ??? \todo{find first}, dense labeling technique has been
+improved over the years. Below are two CVPR 2017 papers that has contributed
+new knowledge, proposing novel techniques that solves various challenges
+associated with this field..
+
+\section{Dense Captioning with Joint Inference and Visual Context}
+
+\section{Weakly Supervised Dense Video Captioning}
 
 \section{Conclusion}
 
