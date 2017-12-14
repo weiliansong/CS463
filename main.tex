@@ -503,11 +503,42 @@ seconds to seconds that has the most relevant and matching information, given
 each region's feature representation. After a sequence is generated, it is
 given to the language model for generating captions.
 
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{networks/language}
+  \caption{Language model for weakly supervised dense video captioning,
+  borrowed from \cite{denseshen}}
+  \label{fig:language}
+\end{figure}
+
 \paragraph{Language Model}
+The language model follows an encoder-decoder structure. An overview of the
+structure is shown in \figref{language}. For a given region-sequence, a series
+of encoder LSTM units encode the frame into regional feature representations,
+then a series of decoder LSTM units decode the representation into a sequence
+of words. Note however that the sequence prediction does not happen until
+the entire sequence feature has been computed. The encoder LSTM units have
+bi-directional channels for propagating information. This is a design choice
+and through author's evaluations, it performs better than unidirectional LSTM
+units.
+
+\subsection{Dense Captioning Network Evaluation}
+As the two networks perform different tasks (image versus video captioning),
+they use two entirely different dataset, which makes direct comparison
+infeasible. However each method is the current state-of-the-art in their
+respective field, beating the recent best methods by a fair margin.
 
 \section{Conclusion}
-
-Conclusion
+Image and video captioning is still a relatively new field, with constant new
+innovation and application like clustering of images/videos based on caption
+and informative subtitles for silent videos. In this survey two improvements
+to a vanilla captioning system are examined, and two different approaches for
+each improvement are evaluated. Each paper identifies current issues and
+challenges with automatic captioning, and addresses them with novel network
+architectures and training methods. While they are far from perfect, they show
+very promising results on very challenging datasets, and hopefully in the near
+future, there will exist near-human level performance for automatic caption
+generation for images and videos.
 
 {\small
 \bibliographystyle{ieee}
