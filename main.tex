@@ -431,8 +431,59 @@ new knowledge, proposing novel techniques that solves various challenges
 associated with this field..
 
 \section{Dense Captioning with Joint Inference and Visual Context}
+Yang et.\ al.\cite{denseyang} proposes a dense image captioning network, which
+jointly learns to classify bounding boxes and captions of regions of interest.
+The proposed architecture consists of two connected networks. First is a
+region detection network, and following is a localization and captioning
+network.
+
+\paragraph{Region Detection Network}
+The purpose of the region detection network (RDN) is to identify areas of high
+interest for the network to generate captions. The authors use Faster R-CNN
+network \cite{renNIPS15fasterrcnn} for the task. Faster R-CNN is an object
+detection network that uses a Region Proposal Network (RPN) to first generate
+region proposals (similar to an attention mechanism) and then detect objects
+within each region. In the case of the RDN, an image is first passed through a
+CNN network to generate image features. Then the features are passed through
+the RPN to obtain region proposals. The convolved image features are passed
+through a series of pooling layers to reduce dimensiality and finally for each
+region proposals, region features are extracted from the pooled features and
+serve as inputs to the localization and captioning network.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{networks/densejoint}
+  \caption{Different model designs for the localization and captioning
+  network, borrowed from \cite{renNIPS15fasterrcnn}}
+  \label{fig:densejoint}
+\end{figure}
+
+\paragraph{Localization and Captioning Network}
+Using the region features as input, the network learns to predict the caption
+and the bounding box offset for each region. Figure \figref{densejoint} shows
+four different variations of the network, all of which uses LSTM for
+generating word at each time step. The left most network is the baseline,
+where the bounding box offset is not dependent upon the recurrent information
+from predicting words. The second, third and fourth network are what the
+authors refer as Shared-LSTM (S-LSTM), Shared-Concatenated-LSTM (SC-LSTM), and
+Twin-LSTM (T-LSTM). It is important to note that the bounding box offset is
+not predicted until after predicting the last word of the caption, so it can
+utilize the entire chain of recurrent information for prediction.
+
+The authors also experimented with a global context fusion technique, where
+the global image feature from the CNN is passed through another set of pooling
+layers to obtain the context feature and concatenated with each region feature
+for caption generation. There can be early and late fusion, as in the two
+features can be concatenated before or during LSTM predictions. Evaluations
+are performed on the two methods as well.
 
 \section{Weakly Supervised Dense Video Captioning}
+Shen et.\ al.\cite{denseshen} approach a slightly different problem of
+generating captions for videos instead of images. Their model is able to
+generate multiple captions given a single video, and while it has been done
+before, the main novelty is that the network is not learning from training
+data that maps specific video frame regions to captions. Instead the network
+extracts rough region candidates and 
 
 \section{Conclusion}
 
