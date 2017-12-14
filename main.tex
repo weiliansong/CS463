@@ -479,11 +479,31 @@ are performed on the two methods as well.
 
 \section{Weakly Supervised Dense Video Captioning}
 Shen et.\ al.\cite{denseshen} approach a slightly different problem of
-generating captions for videos instead of images. Their model is able to
+generating captions for videos instead of images. The model is able to
 generate multiple captions given a single video, and while it has been done
 before, the main novelty is that the network is not learning from training
 data that maps specific video frame regions to captions. Instead the network
-extracts rough region candidates and 
+extracts rough region candidates for each frame, connects corresponding
+regions from each frame to form a sequence, and perform prediction of caption
+with the region-sequence. The network consists of three parts:
+
+\paragraph{Lexical-FCN model}
+This model provides the rough region candidates needed for the region-sequence
+generator, which is inspired by YOLO \cite{yolo}. A $4\times4$ response map is
+generated at the end, resulting in 16 rough regions for each video frame. For
+each region, a feature representation is computed, which is used by the
+following region-sequence generator.
+
+\paragraph{Region-sequence Generation}
+In this section, corresponding region candidates from each frame are connected
+to make a sequence. This turns out to be a difficult task, as the search space
+for regions is roughly $16^n$, where $n$ is the total number of video frames.
+An alternative approach in which the authors use is to match sequences from
+seconds to seconds that has the most relevant and matching information, given
+each region's feature representation. After a sequence is generated, it is
+given to the language model for generating captions.
+
+\paragraph{Language Model}
 
 \section{Conclusion}
 
